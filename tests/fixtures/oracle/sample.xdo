@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataTemplate name="SalesReport" description="Monthly Sales Data Template" version="1.0">
+  <dataSources>
+    <dataSource name="SalesDS" type="JDBC">
+      <connectionString>jdbc:oracle:thin:@localhost:1521:ORCL</connectionString>
+    </dataSource>
+  </dataSources>
+  <parameters>
+    <parameter name="p_year" dataType="NUMBER" defaultValue="2024"
+               displayName="Fiscal Year"/>
+    <parameter name="p_region" dataType="VARCHAR2" defaultValue="GLOBAL"
+               displayName="Region Filter"/>
+  </parameters>
+  <dataQuery>
+    <sqlStatement name="Q_ORDERS" dataSourceRef="SalesDS">
+      <![CDATA[SELECT o.order_id, o.customer_name, o.amount, o.region
+               FROM orders o
+               WHERE EXTRACT(YEAR FROM o.order_date) = :p_year
+                 AND (:p_region = 'GLOBAL' OR o.region = :p_region)
+               ORDER BY o.order_id]]>
+    </sqlStatement>
+  </dataQuery>
+  <dataStructure>
+    <group name="G_ORDERS" source="Q_ORDERS">
+      <element name="ORDER_ID"    dataType="NUMBER"/>
+      <element name="CUSTOMER_NAME" dataType="VARCHAR2"/>
+      <element name="AMOUNT"      dataType="NUMBER"/>
+      <element name="REGION"      dataType="VARCHAR2"/>
+    </group>
+  </dataStructure>
+</dataTemplate>

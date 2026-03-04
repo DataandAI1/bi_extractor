@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pip install -e \".[dev]\")",
+      "Bash(python -c \"import bi_extractor; print\\(f''bi_extractor v{bi_extractor.__version__} imported OK''\\)\")",
+      "Bash(python -c \"from bi_extractor.core import *; print\\(''core OK''\\)\")",
+      "Bash(python -c \"from bi_extractor.parsers import *; print\\(''parsers OK''\\)\")",
+      "Bash(python -c \"from bi_extractor.output import *; print\\(''output OK''\\)\")",
+      "Bash(python -c \"from bi_extractor.cli import *; print\\(''cli OK''\\)\")",
+      "Bash(python -c \"from bi_extractor.gui import *; print\\(''gui OK''\\)\")",
+      "Bash(python -c \"from bi_extractor.core.registry import ParserRegistry, get_registry, reset_registry; print\\(''registry OK''\\)\")",
+      "Bash(python -c \"from bi_extractor.core.engine import discover_files, extract_file, extract_all; print\\(''engine OK''\\)\")",
+      "Bash(python -c \"from bi_extractor.output.csv_formatter import CsvFormatter, to_flat_rows; print\\(''csv_formatter OK''\\)\")",
+      "Bash(python -c \"from bi_extractor.output.base import BaseFormatter; print\\(''base formatter OK''\\)\")",
+      "Bash(python -m pytest tests/ -v)",
+      "mcp__plugin_oh-my-claudecode_t__lsp_diagnostics",
+      "Bash(python -m pytest tests/test_tableau_parser.py -v)",
+      "Bash(python -m pytest tests/test_jrxml_parser.py -v)",
+      "Bash(python -m pytest tests/test_cli.py -v --tb=short)",
+      "Bash(python -m pytest tests/test_birt_parser.py tests/test_xdo_parser.py -v)",
+      "Bash(python -c \"from bi_extractor.parsers.jasper.jrxml_parser import JrxmlParser; p = JrxmlParser\\(\\); print\\(''imports ok, tool='', p.tool, ''extensions='', p.extensions\\)\")",
+      "Bash(python -m pytest tests/ -v --tb=short)"
+    ]
+  }
+}

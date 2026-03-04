@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<datasource name='sample_ds' caption='Sample Data Source' version='18.1'>
+  <connection class='sqlserver' server='db.example.com' database='SalesDB' schema='dbo' username='reader'>
+    <relation name='Orders' table='[dbo].[Orders]' type='table' />
+    <relation name='Customers' table='[dbo].[Customers]' type='table' />
+  </connection>
+
+  <!-- Plain dimension -->
+  <column name='[Customer ID]' caption='Customer ID' datatype='string' role='dimension' />
+
+  <!-- Plain measure -->
+  <column name='[Sales]' caption='Sales' datatype='real' role='measure' />
+
+  <!-- Aggregated measure -->
+  <column name='[Quantity]' caption='Quantity' datatype='integer' role='measure' aggregation='Sum' />
+
+  <!-- Calculated field -->
+  <column name='[Profit Ratio]' caption='Profit Ratio' datatype='real' role='measure'>
+    <calculation class='tableau' formula='SUM([Profit])/SUM([Sales])' />
+  </column>
+
+  <!-- Calculated field that references an internal ID -->
+  <column name='[Calc_001]' caption='Running Total' datatype='real' role='measure'>
+    <calculation class='tableau' formula='RUNNING_SUM(SUM([Sales]))' id='1000000000001' />
+  </column>
+
+  <!-- Field that references the above calc by internal ID -->
+  <column name='[YOY Growth]' caption='YOY Growth' datatype='real' role='measure'>
+    <calculation class='tableau' formula='([Calculation_1000000000001] - [Sales]) / [Sales]' />
+  </column>
+</datasource>

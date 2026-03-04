@@ -1,0 +1,33 @@
+
+[all]
+openpyxl>=3.1
+tableauhyperapi>=0.0.19
+javaobj-py3>=0.4
+requests>=2.31
+mstrio-py>=11.3
+
+[all:sys_platform == "win32"]
+pywin32>=306
+
+[api]
+requests>=2.31
+mstrio-py>=11.3
+
+[crystal]
+
+[crystal:sys_platform == "win32"]
+pywin32>=306
+
+[dev]
+pytest>=7.4
+pytest-cov>=4.1
+mypy>=1.5
+
+[excel]
+openpyxl>=3.1
+
+[qlik]
+javaobj-py3>=0.4
+
+[tableau-hyper]
+tableauhyperapi>=0.0.19

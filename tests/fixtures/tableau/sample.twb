@@ -1,0 +1,39 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<workbook source-build='2023.1.0' source-platform='win' version='18.1' xmlns:user='http://www.tableausoftware.com/xml/user'>
+  <datasources>
+    <datasource name='salesdata' caption='Sales Data'>
+      <connection class='sqlserver' server='db.example.com' database='Sales' />
+      <column name='[Region]' caption='Region' datatype='string' role='dimension' />
+      <column name='[Revenue]' caption='Revenue' datatype='real' role='measure' aggregation='Sum' />
+      <column name='[Calculation_1234567890123]' caption='Profit Ratio' datatype='real' role='measure'>
+        <calculation class='tableau' formula='SUM([Revenue]) / SUM([Cost])' id='1234567890123' />
+      </column>
+      <column name='[Margin]' caption='Margin %' datatype='real' role='measure'>
+        <calculation class='tableau' formula='[Calculation_1234567890123] - 0.05' />
+      </column>
+    </datasource>
+    <datasource name='customerdata' caption='Customer Data'>
+      <connection class='excel-direct' filename='customers.xlsx' />
+      <column name='[CustomerID]' caption='Customer ID' datatype='integer' role='dimension' />
+      <column name='[Segment]' caption='Segment' datatype='string' role='dimension' />
+    </datasource>
+  </datasources>
+  <worksheets>
+    <worksheet name='Revenue Overview'>
+      <datasource-dependencies datasource='salesdata'>
+        <column name='[Region]' />
+        <column name='[Revenue]' />
+        <column name='[Calculation_1234567890123]' />
+      </datasource-dependencies>
+    </worksheet>
+    <worksheet name='Customer Breakdown'>
+      <datasource-dependencies datasource='customerdata'>
+        <column name='[CustomerID]' />
+        <column name='[Segment]' />
+      </datasource-dependencies>
+      <datasource-dependencies datasource='salesdata'>
+        <column name='[Revenue]' />
+      </datasource-dependencies>
+    </worksheet>
+  </worksheets>
+</workbook>

@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Minimal sample JRXML for unit testing the JrxmlParser.
+     Contains fields, variables, parameters, bands, and textFieldExpressions. -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports
+                  http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="SalesReport"
+              pageWidth="595"
+              pageHeight="842"
+              columnWidth="535"
+              language="groovy">
+
+    <!-- SQL query executed against a JDBC datasource -->
+    <queryString><![CDATA[
+        SELECT
+            order_id,
+            customer_name,
+            order_date,
+            amount,
+            region
+        FROM orders
+        WHERE order_date >= $P{startDate}
+          AND region = $P{region}
+        ORDER BY order_date DESC
+    ]]></queryString>
+
+    <!-- Report parameters -->
+    <parameter name="startDate" class="java.util.Date">
+        <defaultValueExpression><![CDATA[new java.util.Date()]]></defaultValueExpression>
+    </parameter>
+    <parameter name="region" class="java.lang.String">
+        <defaultValueExpression><![CDATA["NORTH"]]></defaultValueExpression>
+    </parameter>
+    <!-- Built-in system parameter — should be skipped by parser -->
+    <parameter name="REPORT_CONNECTION" class="java.sql.Connection"/>
+
+    <!-- Dataset fields mapped from the SQL query -->
+    <field name="order_id" class="java.lang.Integer"/>
+    <field name="customer_name" class="java.lang.String"/>
+    <field name="order_date" class="java.util.Date"/>
+    <field name="amount" class="java.math.BigDecimal"/>
+    <field name="region" class="java.lang.String"/>
+
+    <!-- Calculated variables -->
+    <variable name="totalAmount" class="java.math.BigDecimal" calculation="Sum">
+        <variableExpression><![CDATA[$F{amount}]]></variableExpression>
+    </variable>
+    <variable name="orderCount" class="java.lang.Integer" calculation="Count">
+        <variableExpression><![CDATA[$F{order_id}]]></variableExpression>
+    </variable>
+
+    <!-- Report group -->
+    <group name="regionGroup">
+        <groupExpression><![CDATA[$F{region}]]></groupExpression>
+    </group>
+
+    <!-- ===== BANDS ===== -->
+
+    <title>
+        <band height="50">
+            <textField>
+                <reportElement x="0" y="0" width="535" height="30"/>
+                <textFieldExpression><![CDATA["Sales Report"]]></textFieldExpression>
+            </textField>
+        </band>
+    </title>
+
+    <pageHeader>
+        <band height="30">
+            <textField>
+                <reportElement x="0" y="0" width="200" height="20"/>
+                <textFieldExpression><![CDATA["Region: " + $F{region}]]></textFieldExpression>
+            </textField>
+        </band>
+    </pageHeader>
+
+    <columnHeader>
+        <band height="20">
+            <staticText>
+                <reportElement x="0" y="0" width="100" height="20"/>
+                <text><![CDATA[Order ID]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="100" y="0" width="150" height="20"/>
+                <text><![CDATA[Customer]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="250" y="0" width="100" height="20"/>
+                <text><![CDATA[Date]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="350" y="0" width="100" height="20"/>
+                <text><![CDATA[Amount]]></text>
+            </staticText>
+        </band>
+    </columnHeader>
+
+    <detail>
+        <band height="20">
+            <textField>
+                <reportElement x="0" y="0" width="100" height="20"/>
+                <textFieldExpression><![CDATA[$F{order_id}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="100" y="0" width="150" height="20"/>
+                <textFieldExpression><![CDATA[$F{customer_name}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="250" y="0" width="100" height="20"/>
+                <textFieldExpression><![CDATA[$F{order_date}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="350" y="0" width="100" height="20"/>
+                <textFieldExpression><![CDATA[$F{amount}]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+
+    <columnFooter>
+        <band height="20"/>
+    </columnFooter>
+
+    <pageFooter>
+        <band height="25">
+            <textField>
+                <reportElement x="0" y="0" width="200" height="20"/>
+                <textFieldExpression><![CDATA["Page " + $V{PAGE_NUMBER}]]></textFieldExpression>
+            </textField>
+        </band>
+    </pageFooter>
+
+    <summary>
+        <band height="40">
+            <textField>
+                <reportElement x="0" y="0" width="200" height="20"/>
+                <textFieldExpression><![CDATA["Total: " + $F{amount}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="200" y="0" width="200" height="20"/>
+                <textFieldExpression><![CDATA[$V{totalAmount}]]></textFieldExpression>
+            </textField>
+        </band>
+    </summary>
+
+</jasperReport>

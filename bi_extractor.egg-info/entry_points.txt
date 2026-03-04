@@ -1,0 +1,2 @@
+[console_scripts]
+bi-extractor = bi_extractor.cli.main:main

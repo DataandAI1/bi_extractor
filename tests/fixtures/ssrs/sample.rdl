@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition">
+
+  <DataSources>
+    <DataSource Name="SalesDB">
+      <ConnectionProperties>
+        <DataProvider>SQL</DataProvider>
+        <ConnectString>Data Source=srv01;Initial Catalog=Sales;Integrated Security=True</ConnectString>
+      </ConnectionProperties>
+    </DataSource>
+    <DataSource Name="HRDataSource">
+      <ConnectionProperties>
+        <DataProvider>OLEDB</DataProvider>
+        <ConnectString>Provider=SQLOLEDB;Data Source=hr-srv;Initial Catalog=HR</ConnectString>
+      </ConnectionProperties>
+    </DataSource>
+  </DataSources>
+
+  <DataSets>
+    <DataSet Name="SalesDataSet">
+      <Query>
+        <DataSourceName>SalesDB</DataSourceName>
+        <CommandText>SELECT OrderID, CustomerName, Amount, OrderDate FROM dbo.Orders WHERE OrderDate &gt;= @StartDate</CommandText>
+      </Query>
+      <Fields>
+        <Field Name="OrderID">
+          <DataField>OrderID</DataField>
+          <TypeName>System.Int32</TypeName>
+        </Field>
+        <Field Name="CustomerName">
+          <DataField>CustomerName</DataField>
+          <TypeName>System.String</TypeName>
+        </Field>
+        <Field Name="Amount">
+          <DataField>Amount</DataField>
+          <TypeName>System.Decimal</TypeName>
+        </Field>
+        <Field Name="OrderDate">
+          <DataField>OrderDate</DataField>
+          <TypeName>System.DateTime</TypeName>
+        </Field>
+      </Fields>
+    </DataSet>
+    <DataSet Name="EmployeeDataSet">
+      <Query>
+        <DataSourceName>HRDataSource</DataSourceName>
+        <CommandText>SELECT EmployeeID, FullName, Department FROM dbo.Employees</CommandText>
+      </Query>
+      <Fields>
+        <Field Name="EmployeeID">
+          <DataField>EmployeeID</DataField>
+          <TypeName>System.Int32</TypeName>
+        </Field>
+        <Field Name="FullName">
+          <DataField>FullName</DataField>
+          <TypeName>System.String</TypeName>
+        </Field>
+        <Field Name="Department">
+          <DataField>Department</DataField>
+          <TypeName>System.String</TypeName>
+        </Field>
+      </Fields>
+    </DataSet>
+  </DataSets>
+
+  <ReportParameters>
+    <ReportParameter Name="StartDate">
+      <DataType>DateTime</DataType>
+      <Prompt>Start Date</Prompt>
+      <DefaultValue>
+        <Values>
+          <Value>2024-01-01</Value>
+        </Values>
+      </DefaultValue>
+    </ReportParameter>
+    <ReportParameter Name="Region">
+      <DataType>String</DataType>
+      <Prompt>Select Region</Prompt>
+      <ValidValues>
+        <ParameterValue>
+          <Value>North</Value>
+          <Label>North</Label>
+        </ParameterValue>
+        <ParameterValue>
+          <Value>South</Value>
+          <Label>South</Label>
+        </ParameterValue>
+        <ParameterValue>
+          <Value>East</Value>
+          <Label>East</Label>
+        </ParameterValue>
+        <ParameterValue>
+          <Value>West</Value>
+          <Label>West</Label>
+        </ParameterValue>
+      </ValidValues>
+    </ReportParameter>
+  </ReportParameters>
+
+  <Body>
+    <ReportItems>
+      <Tablix Name="SalesTablix">
+        <TablixBody>
+          <TablixColumns>
+            <TablixColumn><Width>2in</Width></TablixColumn>
+            <TablixColumn><Width>2in</Width></TablixColumn>
+            <TablixColumn><Width>1.5in</Width></TablixColumn>
+            <TablixColumn><Width>1.5in</Width></TablixColumn>
+          </TablixColumns>
+        </TablixBody>
+        <DataSetName>SalesDataSet</DataSetName>
+      </Tablix>
+      <Chart Name="SalesChart">
+        <DataSetName>SalesDataSet</DataSetName>
+        <ChartSeriesHierarchy>
+          <ChartMembers>
+            <ChartMember><Label>Amount by Date</Label></ChartMember>
+          </ChartMembers>
+        </ChartSeriesHierarchy>
+      </Chart>
+      <TextBox Name="ReportTitle">
+        <Value>Sales Report</Value>
+      </TextBox>
+    </ReportItems>
+  </Body>
+
+</Report>

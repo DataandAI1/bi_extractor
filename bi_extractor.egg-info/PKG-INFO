@@ -1,0 +1,130 @@
+Metadata-Version: 2.4
+Name: bi-extractor
+Version: 0.1.0
+Summary: Universal BI Report Metadata Extractor - extract metadata from Tableau, Power BI, SSRS, Crystal Reports, Qlik, JasperReports, BIRT, Oracle BI, SAP BO, Pentaho, and MicroStrategy report files
+Author: reyno
+License: MIT
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Information Technology
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Topic :: Database
+Classifier: Topic :: Office/Business
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Provides-Extra: excel
+Requires-Dist: openpyxl>=3.1; extra == "excel"
+Provides-Extra: tableau-hyper
+Requires-Dist: tableauhyperapi>=0.0.19; extra == "tableau-hyper"
+Provides-Extra: crystal
+Requires-Dist: pywin32>=306; sys_platform == "win32" and extra == "crystal"
+Provides-Extra: qlik
+Requires-Dist: javaobj-py3>=0.4; extra == "qlik"
+Provides-Extra: api
+Requires-Dist: requests>=2.31; extra == "api"
+Requires-Dist: mstrio-py>=11.3; extra == "api"
+Provides-Extra: all
+Requires-Dist: openpyxl>=3.1; extra == "all"
+Requires-Dist: tableauhyperapi>=0.0.19; extra == "all"
+Requires-Dist: pywin32>=306; sys_platform == "win32" and extra == "all"
+Requires-Dist: javaobj-py3>=0.4; extra == "all"
+Requires-Dist: requests>=2.31; extra == "all"
+Requires-Dist: mstrio-py>=11.3; extra == "all"
+Provides-Extra: dev
+Requires-Dist: pytest>=7.4; extra == "dev"
+Requires-Dist: pytest-cov>=4.1; extra == "dev"
+Requires-Dist: mypy>=1.5; extra == "dev"
+
+# Tableau Metadata Extractor
+
+A Python GUI application that extracts comprehensive metadata from Tableau workbooks (.twb and .twbx files) and exports it to a structured CSV format.
+
+## Features
+
+- **Comprehensive Field Extraction**: Extracts all fields, dimensions, measures, and calculated fields from Tableau workbooks
+- **Calculation Resolution**: Automatically resolves calculation IDs to human-readable names/aliases
+- **Worksheet Usage Tracking**: Shows which fields are used in which worksheets
+- **Connection Details**: Captures data source connection information
+- **Formula Cleaning**: Converts cryptic calculation references (e.g., `[Calculation_1071856779099492353]`) to readable names (e.g., `[This Year]`)
+- **Batch Processing**: Process multiple Tableau files in a single run
+- **User-Friendly GUI**: Simple interface for selecting input/output folders
+
+## Output Format
+
+The tool generates a single CSV file (`tableau_metadata.csv`) with the following columns:
+
+- **Column ID**: Auto-incrementing identifier
+- **Column Name**: Technical field name
+- **Column Alias**: User-friendly display name
+- **Field Type**: Dimension, Measure, Calculated Field, Table Calculation, etc.
+- **Connection Name**: Data source connection details
+- **Connection Alias**: Data source display name
+- **datatype**: Tableau data type (string, integer, etc.)
+- **role**: Field role (dimension/measure)
+- **Calculation Formula**: Cleaned formula with resolved references
+- **Original Calculation**: Raw formula with calculation IDs
+- **Calc Clean Status**: Success, Partially Resolved, Unresolved References, or No Calculation
+- **Field Used in Worksheets**: Yes/No indicator
+- **Worksheet Name**: Name of worksheet using the field
+- **File Name**: Source Tableau file
+
+## Requirements
+
+- Python 3.x
+- Standard library only (no external dependencies)
+- tkinter (usually included with Python)
+
+## Usage
+
+1. Run the script:
+   ```bash
+   python tableau_metadata_extractor.py
+   ```
+
+2. In the GUI:
+   - Click "Browse..." next to "Input Folder" and select the folder containing your Tableau files
+   - Click "Browse..." next to "Output Folder" and select where you want the CSV output saved
+   - Click "Extract Metadata" to process all .twb and .twbx files
+
+3. The tool will:
+   - Scan all subdirectories for Tableau files
+   - Extract metadata from each file
+   - Create one row per field-worksheet combination
+   - Save results to `tableau_metadata.csv` in your output folder
+
+## How It Works
+
+1. **XML Parsing**: Tableau workbooks are XML-based, so the tool parses the structure
+2. **TWBX Handling**: For packaged workbooks (.twbx), it extracts the embedded .twb file
+3. **ID Resolution**: Builds a mapping of calculation IDs to their captions/aliases
+4. **Multi-Pattern Matching**: Handles various calculation reference formats:
+   - `[Calculation_1234567890123]`
+   - `[1234567890123]`
+   - `@{1234567890123}`
+
+## Example
+
+If your Tableau workbook contains a calculation like:
+```
+[Calculation_1071856779099492353] / [Calculation_1071856779102896130]
+```
+
+The tool will output the cleaned formula as:
+```
+[This Year] / [Weeks Cover LW]
+```
+
+## Troubleshooting
+
+- **Empty columns**: Ensure your Tableau files are saved with captions/aliases for calculated fields
+- **Unresolved references**: Some calculation IDs may not have corresponding definitions in the workbook
+- **Permission errors**: Make sure you have read access to input files and write access to the output folder
+
+## License
+
+This tool is provided as-is for metadata extraction and documentation purposes.

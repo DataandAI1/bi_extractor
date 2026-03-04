@@ -1,0 +1,63 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bi-extractor"
+version = "0.1.0"
+description = "Universal BI Report Metadata Extractor - extract metadata from Tableau, Power BI, SSRS, Crystal Reports, Qlik, JasperReports, BIRT, Oracle BI, SAP BO, Pentaho, and MicroStrategy report files"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+authors = [
+    {name = "reyno"},
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Information Technology",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Database",
+    "Topic :: Office/Business",
+]
+
+[project.optional-dependencies]
+excel = ["openpyxl>=3.1"]
+tableau-hyper = ["tableauhyperapi>=0.0.19"]
+crystal = ["pywin32>=306; sys_platform == 'win32'"]
+qlik = ["javaobj-py3>=0.4"]
+api = ["requests>=2.31", "mstrio-py>=11.3"]
+all = [
+    "openpyxl>=3.1",
+    "tableauhyperapi>=0.0.19",
+    "pywin32>=306; sys_platform == 'win32'",
+    "javaobj-py3>=0.4",
+    "requests>=2.31",
+    "mstrio-py>=11.3",
+]
+dev = [
+    "pytest>=7.4",
+    "pytest-cov>=4.1",
+    "mypy>=1.5",
+]
+
+[project.scripts]
+bi-extractor = "bi_extractor.cli.main:main"
+
+[tool.setuptools.packages.find]
+include = ["bi_extractor*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short"
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
