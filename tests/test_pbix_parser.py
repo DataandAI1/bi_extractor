@@ -2,13 +2,39 @@
 
 from __future__ import annotations
 
+import io
 import json
+import struct
 import zipfile
 from pathlib import Path
 
 import pytest
 
 from bi_extractor.parsers.microsoft.pbix_parser import PbixParser
+
+
+def _build_data_mashup(m_code: str, metadata_xml: str = "") -> bytes:
+    """Build a synthetic DataMashup binary blob for testing.
+
+    DataMashup format: version(4) + pkg_len(4) + pkg_zip(N) +
+                       perm_len(4) + perm(0) + meta_len(4) + meta_xml(K)
+    """
+    # Build inner ZIP with M formula
+    inner_buf = io.BytesIO()
+    with zipfile.ZipFile(inner_buf, "w") as inner_zf:
+        inner_zf.writestr("Formulas/Section1.m", m_code.encode("utf-8"))
+    pkg_data = inner_buf.getvalue()
+
+    # Assemble binary blob
+    parts = bytearray()
+    parts += struct.pack("<I", 0)  # version
+    parts += struct.pack("<I", len(pkg_data))
+    parts += pkg_data
+    parts += struct.pack("<I", 0)  # permissions length (empty)
+    meta_bytes = metadata_xml.encode("utf-8") if metadata_xml else b""
+    parts += struct.pack("<I", len(meta_bytes))
+    parts += meta_bytes
+    return bytes(parts)
 
 
 def _create_sample_pbix(path: Path) -> Path:
@@ -109,10 +135,21 @@ def _create_sample_pbix(path: Path) -> Path:
         ],
     }
 
+    connections = {
+        "Connections": [
+            {
+                "Name": "SqlServer salesdb",
+                "ConnectionString": "Data Source=salesserver;Initial Catalog=salesdb",
+                "PbiServiceModelId": None,
+            }
+        ],
+    }
+
     pbix_path = path / "sample.pbix"
     with zipfile.ZipFile(pbix_path, "w") as zf:
         zf.writestr("DataModelSchema", json.dumps(model))
         zf.writestr("Report/Layout", json.dumps(layout))
+        zf.writestr("Connections", json.dumps(connections))
     return pbix_path
 
 
@@ -372,3 +409,138 @@ class TestPbixParserSample:
     ) -> None:
         result = parser.parse(sample_pbix)
         assert result.metadata.get("model_name") == "SalesModel"
+
+
+# ---------------------------------------------------------------------------
+# Legacy binary DataModel format detection
+# ---------------------------------------------------------------------------
+
+
+class TestPbixParserLegacyFormat:
+    def test_legacy_without_mashup_has_no_fields(
+        self, parser: PbixParser, tmp_path: Path
+    ) -> None:
+        """PBIX with only binary DataModel (no DataMashup) yields no fields."""
+        pbix_path = tmp_path / "legacy.pbix"
+        with zipfile.ZipFile(pbix_path, "w") as zf:
+            zf.writestr("DataModel", b"\x00\x01\x02binary data")
+        result = parser.parse(pbix_path)
+        assert result.fields == []
+        assert result.metadata.get("legacy_format") == "true"
+
+    def test_legacy_extracts_layout(
+        self, parser: PbixParser, tmp_path: Path
+    ) -> None:
+        """Legacy format should still extract Report/Layout if present."""
+        layout = {
+            "sections": [
+                {"name": "S1", "displayName": "Overview", "visualContainers": []}
+            ]
+        }
+        pbix_path = tmp_path / "legacy_with_layout.pbix"
+        with zipfile.ZipFile(pbix_path, "w") as zf:
+            zf.writestr("DataModel", b"\x00\x01\x02binary data")
+            zf.writestr("Report/Layout", json.dumps(layout))
+        result = parser.parse(pbix_path)
+        assert len(result.report_elements) == 1
+        assert result.report_elements[0].name == "Overview"
+
+    def test_legacy_extracts_from_data_mashup(
+        self, parser: PbixParser, tmp_path: Path
+    ) -> None:
+        """Legacy format extracts fields and datasources from DataMashup."""
+        m_code = (
+            'section Section1;\n'
+            'shared Orders = let\n'
+            '    Source = Sql.Database("myserver.com", "salesdb")\n'
+            'in Source;\n'
+        )
+        metadata_xml = (
+            '<?xml version="1.0" encoding="utf-8"?>'
+            '<LocalPackageMetadataFile>'
+            '<Items>'
+            '<Item><ItemLocation><ItemType>Formula</ItemType>'
+            '<ItemPath>Section1/Orders</ItemPath></ItemLocation>'
+            '<StableEntries>'
+            '<Entry Type="FillColumnNames" Value="s[&quot;OrderID&quot;,&quot;Amount&quot;,&quot;Date&quot;]" />'
+            '</StableEntries></Item>'
+            '</Items>'
+            '</LocalPackageMetadataFile>'
+        )
+        mashup = _build_data_mashup(m_code, metadata_xml)
+
+        pbix_path = tmp_path / "legacy_mashup.pbix"
+        with zipfile.ZipFile(pbix_path, "w") as zf:
+            zf.writestr("DataModel", b"\x00binary")
+            zf.writestr("DataMashup", mashup)
+        result = parser.parse(pbix_path)
+
+        # Should extract datasource from M expression
+        assert len(result.datasources) >= 1
+        ds_names = {ds.name for ds in result.datasources}
+        assert any("myserver.com" in n for n in ds_names)
+
+        # Should extract columns from metadata XML
+        assert len(result.fields) == 3
+        field_names = {f.name for f in result.fields}
+        assert field_names == {"OrderID", "Amount", "Date"}
+
+        # Should extract table name from M shared declaration
+        assert "Orders" in result.metadata.get("mashup_tables", [])
+
+    def test_legacy_mashup_datasource_extracted(
+        self, parser: PbixParser, tmp_path: Path
+    ) -> None:
+        """DataMashup M code should yield datasources for legacy files."""
+        m_code = (
+            'section Section1;\n'
+            'shared Sales = let\n'
+            '    Source = OData.Feed("https://api.example.com/sales")\n'
+            'in Source;\n'
+        )
+        mashup = _build_data_mashup(m_code)
+
+        pbix_path = tmp_path / "legacy_odata.pbix"
+        with zipfile.ZipFile(pbix_path, "w") as zf:
+            zf.writestr("DataModel", b"\x00binary")
+            zf.writestr("DataMashup", mashup)
+        result = parser.parse(pbix_path)
+
+        assert len(result.datasources) >= 1
+        assert any("OData" in ds.connection_type for ds in result.datasources)
+
+
+# ---------------------------------------------------------------------------
+# Connections entry tests
+# ---------------------------------------------------------------------------
+
+
+class TestPbixParserConnections:
+    def test_connections_entry_extracted(
+        self, parser: PbixParser, tmp_path: Path
+    ) -> None:
+        """Connections entry should yield datasources."""
+        connections = {
+            "Connections": [
+                {
+                    "Name": "MyServer",
+                    "ConnectionString": "Data Source=srv;Initial Catalog=mydb",
+                }
+            ]
+        }
+        pbix_path = tmp_path / "conn.pbix"
+        with zipfile.ZipFile(pbix_path, "w") as zf:
+            zf.writestr("DataModelSchema", json.dumps({"name": "M"}))
+            zf.writestr("Connections", json.dumps(connections))
+        result = parser.parse(pbix_path)
+        assert len(result.datasources) >= 1
+        names = {ds.name for ds in result.datasources}
+        assert "MyServer" in names
+
+    def test_connections_does_not_duplicate_model_datasources(
+        self, parser: PbixParser, sample_pbix: Path
+    ) -> None:
+        """If datasource already exists from model, Connections should not duplicate."""
+        result = parser.parse(sample_pbix)
+        ds_names = [ds.name for ds in result.datasources]
+        assert ds_names.count("SqlServer salesdb") == 1

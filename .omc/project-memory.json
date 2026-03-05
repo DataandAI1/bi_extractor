@@ -35,20 +35,20 @@
   "hotPaths": [
     {
       "path": "bi_extractor\\core\\models.py",
-      "accessCount": 23,
-      "lastAccessed": 1772684804490,
+      "accessCount": 25,
+      "lastAccessed": 1772689037757,
+      "type": "file"
+    },
+    {
+      "path": "bi_extractor\\parsers\\base.py",
+      "accessCount": 19,
+      "lastAccessed": 1772689038203,
       "type": "file"
     },
     {
       "path": "bi_extractor\\parsers\\microsoft\\ssrs_parser.py",
       "accessCount": 18,
       "lastAccessed": 1772685398224,
-      "type": "file"
-    },
-    {
-      "path": "bi_extractor\\parsers\\base.py",
-      "accessCount": 18,
-      "lastAccessed": 1772687921171,
       "type": "file"
     },
     {
@@ -64,16 +64,16 @@
       "type": "file"
     },
     {
+      "path": "",
+      "accessCount": 16,
+      "lastAccessed": 1772688501406,
+      "type": "directory"
+    },
+    {
       "path": "pyproject.toml",
       "accessCount": 15,
       "lastAccessed": 1772680190774,
       "type": "file"
-    },
-    {
-      "path": "",
-      "accessCount": 14,
-      "lastAccessed": 1772682781990,
-      "type": "directory"
     },
     {
       "path": "bi_extractor\\core\\registry.py",
