@@ -110,9 +110,16 @@ class PbixParser(BaseParser):
 
         try:
             if model is not None:
-                result.datasources = self._extract_datasources(model)
-                result.fields = self._extract_fields(model)
-                result.relationships = self._extract_relationships(model)
+                # Real PBIX files use TMSL format where tables/relationships/
+                # dataSources are nested under a "model" key.  The synthetic
+                # test fixtures put them at the top level, so accept both.
+                inner = model.get("model", model)
+
+                result.datasources = self._extract_datasources(inner)
+                result.fields = self._extract_fields(inner)
+                result.relationships = self._extract_relationships(inner)
+
+                # Model name lives at the top level in TMSL
                 model_name = model.get("name")
                 if model_name:
                     result.metadata["model_name"] = model_name

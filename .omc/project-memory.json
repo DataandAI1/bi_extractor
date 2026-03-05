@@ -46,15 +46,15 @@
       "type": "file"
     },
     {
-      "path": "tests\\conftest.py",
-      "accessCount": 17,
-      "lastAccessed": 1772682771302,
+      "path": "bi_extractor\\parsers\\base.py",
+      "accessCount": 18,
+      "lastAccessed": 1772687921171,
       "type": "file"
     },
     {
-      "path": "bi_extractor\\parsers\\base.py",
+      "path": "tests\\conftest.py",
       "accessCount": 17,
-      "lastAccessed": 1772684815305,
+      "lastAccessed": 1772682771302,
       "type": "file"
     },
     {
@@ -77,8 +77,8 @@
     },
     {
       "path": "bi_extractor\\core\\registry.py",
-      "accessCount": 12,
-      "lastAccessed": 1772682760943,
+      "accessCount": 13,
+      "lastAccessed": 1772688030074,
       "type": "file"
     },
     {
@@ -100,15 +100,15 @@
       "type": "file"
     },
     {
-      "path": "bi_extractor\\core\\engine.py",
-      "accessCount": 7,
-      "lastAccessed": 1772679959191,
+      "path": "bi_extractor\\output\\csv_formatter.py",
+      "accessCount": 8,
+      "lastAccessed": 1772687994446,
       "type": "file"
     },
     {
-      "path": "bi_extractor\\output\\csv_formatter.py",
-      "accessCount": 7,
-      "lastAccessed": 1772679964598,
+      "path": "bi_extractor\\core\\engine.py",
+      "accessCount": 8,
+      "lastAccessed": 1772688073727,
       "type": "file"
     },
     {

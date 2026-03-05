@@ -129,9 +129,13 @@ class MstrParser(BaseParser):
                 # MSTR dossiers can contain binary data, XML metadata, and cubes.
                 # Skip known binary/data extensions to avoid reading huge datasets
                 skip_exts = (".cube", ".delta", ".png", ".jpg", ".jpeg", ".gif", ".mp4", ".pdf", ".bin")
+                found_binary_metadata = False
                 
                 for name in zf.namelist():
-                    if name.lower().endswith(skip_exts):
+                    lower_name = name.lower()
+                    if lower_name.endswith(skip_exts):
+                        if lower_name.endswith((".cube", ".delta")):
+                            found_binary_metadata = True
                         continue
                         
                     # Quick heuristic to avoid reading huge binary blobs into memory
@@ -151,13 +155,16 @@ class MstrParser(BaseParser):
                         roots.append(root)
                     except ET.ParseError as exc:
                         # Only log errors if the file explicitly claimed to be XML, reduce noise
-                        if name.lower().endswith(".xml"):
+                        if lower_name.endswith(".xml"):
                             msg = f"XML parse error in {name} within {file_str}: {exc}"
                             logger.error(msg)
                             result.errors.append(msg)
                             
                 if not roots:
-                    msg = f"No valid XML metadata found in ZIP archive: {file_str}"
+                    if found_binary_metadata:
+                        msg = f"File contains proprietary binary metadata (.cube/.delta) without XML definitions. Binary parsing is currently unsupported: {file_str}"
+                    else:
+                        msg = f"No valid XML metadata found in ZIP archive: {file_str}"
                     logger.warning(msg)
                     result.errors.append(msg)
                     return []

@@ -12,56 +12,64 @@ from bi_extractor.parsers.microsoft.pbix_parser import PbixParser
 
 
 def _create_sample_pbix(path: Path) -> Path:
-    """Create a synthetic .pbix file for testing."""
+    """Create a synthetic .pbix file for testing.
+
+    Uses the real TMSL format where tables/relationships/dataSources live
+    under a top-level ``"model"`` key, matching actual Power BI Desktop output.
+    """
     model = {
         "name": "SalesModel",
-        "tables": [
-            {
-                "name": "Sales",
-                "columns": [
-                    {"name": "OrderID", "dataType": "int64", "sourceColumn": "order_id"},
-                    {"name": "Amount", "dataType": "double", "sourceColumn": "amount"},
-                    {"name": "OrderDate", "dataType": "dateTime", "sourceColumn": "order_date"},
-                    {"name": "CustomerID", "dataType": "int64", "sourceColumn": "customer_id"},
-                ],
-                "measures": [
-                    {"name": "Total Sales", "expression": "SUM(Sales[Amount])"},
-                    {"name": "Order Count", "expression": "COUNTROWS(Sales)"},
-                ],
-                "partitions": [
-                    {
-                        "source": {
-                            "type": "m",
-                            "expression": 'let Source = Sql.Database("salesserver", "salesdb") in Source',
+        "compatibilityLevel": 1567,
+        "model": {
+            "culture": "en-US",
+            "tables": [
+                {
+                    "name": "Sales",
+                    "columns": [
+                        {"name": "OrderID", "dataType": "int64", "sourceColumn": "order_id"},
+                        {"name": "Amount", "dataType": "double", "sourceColumn": "amount"},
+                        {"name": "OrderDate", "dataType": "dateTime", "sourceColumn": "order_date"},
+                        {"name": "CustomerID", "dataType": "int64", "sourceColumn": "customer_id"},
+                    ],
+                    "measures": [
+                        {"name": "Total Sales", "expression": "SUM(Sales[Amount])"},
+                        {"name": "Order Count", "expression": "COUNTROWS(Sales)"},
+                    ],
+                    "partitions": [
+                        {
+                            "source": {
+                                "type": "m",
+                                "expression": 'let Source = Sql.Database("salesserver", "salesdb") in Source',
+                            }
                         }
-                    }
-                ],
-            },
-            {
-                "name": "Customers",
-                "columns": [
-                    {"name": "CustomerID", "dataType": "int64", "sourceColumn": "customer_id"},
-                    {"name": "CustomerName", "dataType": "string", "sourceColumn": "name"},
-                    {"name": "Region", "dataType": "string", "sourceColumn": "region"},
-                ],
-                "measures": [],
-            },
-        ],
-        "relationships": [
-            {
-                "fromTable": "Sales",
-                "fromColumn": "CustomerID",
-                "toTable": "Customers",
-                "toColumn": "CustomerID",
-                "crossFilteringBehavior": 1,
-            }
-        ],
-        "dataSources": [
-            {
-                "name": "SqlServer salesdb",
-                "connectionString": "Data Source=salesserver;Initial Catalog=salesdb",
-            }
-        ],
+                    ],
+                },
+                {
+                    "name": "Customers",
+                    "columns": [
+                        {"name": "CustomerID", "dataType": "int64", "sourceColumn": "customer_id"},
+                        {"name": "CustomerName", "dataType": "string", "sourceColumn": "name"},
+                        {"name": "Region", "dataType": "string", "sourceColumn": "region"},
+                    ],
+                    "measures": [],
+                },
+            ],
+            "relationships": [
+                {
+                    "fromTable": "Sales",
+                    "fromColumn": "CustomerID",
+                    "toTable": "Customers",
+                    "toColumn": "CustomerID",
+                    "crossFilteringBehavior": 1,
+                }
+            ],
+            "dataSources": [
+                {
+                    "name": "SqlServer salesdb",
+                    "connectionString": "Data Source=salesserver;Initial Catalog=salesdb",
+                }
+            ],
+        },
     }
 
     visual_config = json.dumps({
