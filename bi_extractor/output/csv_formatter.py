@@ -154,7 +154,7 @@ class CsvFormatter:
         self,
         results: list[ExtractionResult],
         output_path: Path,
-        filename: str = "bi_metadata.csv",
+        filename: str = "BI_Metadata.csv",
     ) -> Path:
         """Write extraction results as a CSV file.
 

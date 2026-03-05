@@ -1,88 +1,77 @@
-# Tableau Metadata Extractor
+# BI Metadata Extractor
 
-A Python GUI application that extracts comprehensive metadata from Tableau workbooks (.twb and .twbx files) and exports it to a structured CSV format.
+A universal metadata extraction tool for Business Intelligence (BI) report files. It extracts comprehensive metadata from various BI formats and exports it to a structured CSV format.
+
+## Supported Tools and Formats
+
+| Tool | Supported Extensions |
+| :--- | :--- |
+| **Tableau** | .twb, .twbx, .tds, .tdsx |
+| **Microsoft SSRS** | .rdl, .rdlc |
+| **JasperReports** | .jrxml |
+| **BIRT** | .rptdesign |
+| **Oracle BI Publisher** | .xdo, .xdoz |
 
 ## Features
 
-- **Comprehensive Field Extraction**: Extracts all fields, dimensions, measures, and calculated fields from Tableau workbooks
-- **Calculation Resolution**: Automatically resolves calculation IDs to human-readable names/aliases
-- **Worksheet Usage Tracking**: Shows which fields are used in which worksheets
-- **Connection Details**: Captures data source connection information
-- **Formula Cleaning**: Converts cryptic calculation references (e.g., `[Calculation_1071856779099492353]`) to readable names (e.g., `[This Year]`)
-- **Batch Processing**: Process multiple Tableau files in a single run
-- **User-Friendly GUI**: Simple interface for selecting input/output folders
+- **Multi-Format Support**: Single tool for extracting metadata across different BI platforms.
+- **Comprehensive Field Extraction**: Extracts fields, dimensions, measures, and calculated fields.
+- **Calculation Resolution**: Automatically resolves calculation IDs to human-readable names where possible.
+- **Connection Details**: Captures data source connection information.
+- **Batch Processing**: Process multiple files and directories in a single run.
+- **Search & Discovery**: Recursively scans directories to find and process all supported BI files.
 
 ## Output Format
 
-The tool generates a single CSV file (`tableau_metadata.csv`) with the following columns:
+The tool generates a single CSV file (`BI_Metadata.csv`) with the following columns:
 
-- **Column ID**: Auto-incrementing identifier
+- **Column ID**: Sequential identifier across all processed files
 - **Column Name**: Technical field name
 - **Column Alias**: User-friendly display name
-- **Field Type**: Dimension, Measure, Calculated Field, Table Calculation, etc.
+- **Field Type**: Dimension, Measure, Calculated Field, etc.
 - **Connection Name**: Data source connection details
 - **Connection Alias**: Data source display name
-- **datatype**: Tableau data type (string, integer, etc.)
+- **datatype**: Data type (string, integer, etc.)
 - **role**: Field role (dimension/measure)
 - **Calculation Formula**: Cleaned formula with resolved references
-- **Original Calculation**: Raw formula with calculation IDs
-- **Calc Clean Status**: Success, Partially Resolved, Unresolved References, or No Calculation
+- **Original Calculation**: Raw formula from source
+- **Calc Clean Status**: Success, Partially Resolved, or No Calculation
 - **Field Used in Worksheets**: Yes/No indicator
-- **Worksheet Name**: Name of worksheet using the field
-- **File Name**: Source Tableau file
+- **Worksheet Name**: Name of report element/worksheet using the field
+- **File Name**: Source file name
+- **Tool**: BI tool name (e.g., Tableau, SSRS)
+- **File Type**: Extension of the source file
+- **Parameter Count**: Number of parameters in the report
+- **Relationship Count**: Number of relationships/joins identified
+- **Extraction Errors**: Details of any issues encountered during extraction
 
 ## Requirements
 
-- Python 3.x
-- Standard library only (no external dependencies)
-- tkinter (usually included with Python)
+- Python 3.8+
+- Standard library (some specialized parsers may have optional dependencies)
 
 ## Usage
 
-1. Run the script:
-   ```bash
-   python tableau_metadata_extractor.py
-   ```
+### Command Line Interface
 
-2. In the GUI:
-   - Click "Browse..." next to "Input Folder" and select the folder containing your Tableau files
-   - Click "Browse..." next to "Output Folder" and select where you want the CSV output saved
-   - Click "Extract Metadata" to process all .twb and .twbx files
+```bash
+# Extract metadata from all supported files in a directory
+python -m bi_extractor.cli.main extract /path/to/bi/files -o /output/dir
 
-3. The tool will:
-   - Scan all subdirectories for Tableau files
-   - Extract metadata from each file
-   - Create one row per field-worksheet combination
-   - Save results to `tableau_metadata.csv` in your output folder
+# List all supported formats and their status
+python -m bi_extractor.cli.main list-formats
 
-## How It Works
-
-1. **XML Parsing**: Tableau workbooks are XML-based, so the tool parses the structure
-2. **TWBX Handling**: For packaged workbooks (.twbx), it extracts the embedded .twb file
-3. **ID Resolution**: Builds a mapping of calculation IDs to their captions/aliases
-4. **Multi-Pattern Matching**: Handles various calculation reference formats:
-   - `[Calculation_1234567890123]`
-   - `[1234567890123]`
-   - `@{1234567890123}`
-
-## Example
-
-If your Tableau workbook contains a calculation like:
-```
-[Calculation_1071856779099492353] / [Calculation_1071856779102896130]
+# Show metadata summary for a single file
+python -m bi_extractor.cli.main info /path/to/file.twb
 ```
 
-The tool will output the cleaned formula as:
-```
-[This Year] / [Weeks Cover LW]
-```
+### Options
 
-## Troubleshooting
-
-- **Empty columns**: Ensure your Tableau files are saved with captions/aliases for calculated fields
-- **Unresolved references**: Some calculation IDs may not have corresponding definitions in the workbook
-- **Permission errors**: Make sure you have read access to input files and write access to the output folder
+- `-o, --output DIR`: Specify output directory (default: current directory)
+- `-r, --recursive`: Scan subdirectories (default: true)
+- `-t, --types twb,rdl`: Only process specific extensions
+- `-v, --verbose`: Enable verbose logging
 
 ## License
 
-This tool is provided as-is for metadata extraction and documentation purposes.
+This tool is provided for metadata extraction and documentation purposes.
