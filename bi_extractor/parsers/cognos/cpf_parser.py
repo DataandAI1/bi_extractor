@@ -188,14 +188,29 @@ class CognosCpfParser(BaseParser):
 
                 alias = _attr(qi_el, "alias", "displayName", "label")
 
+                # Infer role from Cognos data types
+                role = ""
+                if data_type:
+                    lower_dt = data_type.lower()
+                    if lower_dt in (
+                        "integer", "int32", "int64", "float", "double",
+                        "decimal", "numeric", "money", "currency",
+                    ):
+                        role = "measure"
+                    else:
+                        role = "dimension"
+
+                field_type = "calculated" if expression else "regular"
                 fields.append(
                     Field(
                         name=name,
                         alias=alias,
                         data_type=data_type,
+                        role=role,
+                        field_type=field_type,
                         formula=expression,
                         original_formula=expression,
-                        formula_status="valid" if expression else "",
+                        formula_status="Success" if expression else "",
                         datasource=qs_name,
                     )
                 )

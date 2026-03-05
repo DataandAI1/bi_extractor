@@ -14,6 +14,9 @@
         <ConnectString>Provider=SQLOLEDB;Data Source=hr-srv;Initial Catalog=HR</ConnectString>
       </ConnectionProperties>
     </DataSource>
+    <DataSource Name="SharedSource">
+      <DataSourceReference>/DataSources/CorporateDB</DataSourceReference>
+    </DataSource>
   </DataSources>
 
   <DataSets>
@@ -39,7 +42,24 @@
           <DataField>OrderDate</DataField>
           <TypeName>System.DateTime</TypeName>
         </Field>
+        <Field Name="TotalWithTax">
+          <Value>=Fields!Amount.Value * 1.1</Value>
+          <TypeName>System.Decimal</TypeName>
+        </Field>
+        <Field Name="DisplayName">
+          <Value>=Fields!CustomerName.Value &amp; " - " &amp; CStr(Fields!OrderID.Value)</Value>
+          <TypeName>System.String</TypeName>
+        </Field>
       </Fields>
+      <Filters>
+        <Filter>
+          <FilterExpression>=Fields!Amount.Value</FilterExpression>
+          <Operator>GreaterThan</Operator>
+          <FilterValues>
+            <FilterValue>100</FilterValue>
+          </FilterValues>
+        </Filter>
+      </Filters>
     </DataSet>
     <DataSet Name="EmployeeDataSet">
       <Query>
@@ -95,6 +115,15 @@
         </ParameterValue>
       </ValidValues>
     </ReportParameter>
+    <ReportParameter Name="InternalFilter">
+      <DataType>Integer</DataType>
+      <Hidden>true</Hidden>
+      <DefaultValue>
+        <Values>
+          <Value>0</Value>
+        </Values>
+      </DefaultValue>
+    </ReportParameter>
   </ReportParameters>
 
   <Body>
@@ -107,16 +136,64 @@
             <TablixColumn><Width>1.5in</Width></TablixColumn>
             <TablixColumn><Width>1.5in</Width></TablixColumn>
           </TablixColumns>
+          <TablixRows>
+            <TablixRow>
+              <TablixCells>
+                <TablixCell>
+                  <CellContents>
+                    <TextBox Name="OrderID_Cell">
+                      <Value>=Fields!OrderID.Value</Value>
+                    </TextBox>
+                  </CellContents>
+                </TablixCell>
+                <TablixCell>
+                  <CellContents>
+                    <TextBox Name="CustomerName_Cell">
+                      <Value>=Fields!CustomerName.Value</Value>
+                    </TextBox>
+                  </CellContents>
+                </TablixCell>
+                <TablixCell>
+                  <CellContents>
+                    <TextBox Name="Amount_Cell">
+                      <Value>=Fields!Amount.Value</Value>
+                    </TextBox>
+                  </CellContents>
+                </TablixCell>
+                <TablixCell>
+                  <CellContents>
+                    <TextBox Name="TotalWithTax_Cell">
+                      <Value>=Fields!TotalWithTax.Value</Value>
+                    </TextBox>
+                  </CellContents>
+                </TablixCell>
+              </TablixCells>
+            </TablixRow>
+          </TablixRows>
         </TablixBody>
         <DataSetName>SalesDataSet</DataSetName>
+        <Filters>
+          <Filter>
+            <FilterExpression>=Fields!OrderDate.Value</FilterExpression>
+            <Operator>GreaterThanOrEqual</Operator>
+            <FilterValues>
+              <FilterValue>=Parameters!StartDate.Value</FilterValue>
+            </FilterValues>
+          </Filter>
+        </Filters>
       </Tablix>
       <Chart Name="SalesChart">
         <DataSetName>SalesDataSet</DataSetName>
         <ChartSeriesHierarchy>
           <ChartMembers>
-            <ChartMember><Label>Amount by Date</Label></ChartMember>
+            <ChartMember><Label>=Fields!OrderDate.Value</Label></ChartMember>
           </ChartMembers>
         </ChartSeriesHierarchy>
+        <ChartCategoryHierarchy>
+          <ChartMembers>
+            <ChartMember><Label>=Fields!Amount.Value</Label></ChartMember>
+          </ChartMembers>
+        </ChartCategoryHierarchy>
       </Chart>
       <TextBox Name="ReportTitle">
         <Value>Sales Report</Value>

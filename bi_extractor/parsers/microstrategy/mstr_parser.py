@@ -225,6 +225,7 @@ class MstrParser(BaseParser):
                 Field(
                     name=name,
                     data_type=data_type,
+                    role="dimension",
                     field_type="attribute",
                     datasource=table,
                     alias=description,
@@ -244,8 +245,11 @@ class MstrParser(BaseParser):
                 Field(
                     name=name,
                     data_type=data_type,
+                    role="measure",
                     field_type="metric",
                     formula=formula,
+                    original_formula=formula,
+                    formula_status="Success" if formula else "",
                     alias=description,
                 )
             )

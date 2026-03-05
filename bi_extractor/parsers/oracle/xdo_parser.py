@@ -204,10 +204,24 @@ class OracleXdoParser(BaseParser):
             if not name:
                 continue
 
+            # Infer role from XDO data types
+            role = ""
+            if data_type:
+                lower_type = data_type.lower()
+                if lower_type in (
+                    "number", "integer", "int", "float", "double",
+                    "decimal", "long", "currency", "numeric",
+                ):
+                    role = "measure"
+                else:
+                    role = "dimension"
+
             fields.append(
                 Field(
                     name=name,
                     data_type=data_type,
+                    field_type="column",
+                    role=role,
                     datasource=datasource,
                 )
             )

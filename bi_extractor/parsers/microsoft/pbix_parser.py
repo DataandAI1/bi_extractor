@@ -37,6 +37,33 @@ _CROSS_FILTER_MAP: dict[int, str] = {
     2: "bothDirections",
 }
 
+# Regex for connection string key=value parsing
+_CONN_STR_RE = re.compile(r"([\w\s]+?)\s*=\s*([^;]*)")
+
+# Power BI data types that indicate a measure role
+_NUMERIC_DATATYPES: set[str] = {
+    "int64", "double", "decimal", "currency", "percentage",
+}
+
+
+def _parse_connection_string(conn_str: str) -> dict[str, str]:
+    """Parse a semicolon-delimited connection string into a dict."""
+    result: dict[str, str] = {}
+    for match in _CONN_STR_RE.finditer(conn_str):
+        key = match.group(1).strip().lower()
+        value = match.group(2).strip()
+        result[key] = value
+    return result
+
+
+def _infer_role(data_type: str) -> str:
+    """Infer dimension/measure role from Power BI data type."""
+    if not data_type:
+        return ""
+    if data_type.lower() in _NUMERIC_DATATYPES:
+        return "measure"
+    return "dimension"
+
 
 class PbixParser(BaseParser):
     """Parser for Power BI Desktop .pbix report files.
@@ -152,10 +179,22 @@ class PbixParser(BaseParser):
             conn_string = ds.get("connectionString", "")
             if name and name not in seen:
                 seen.add(name)
+                database = ""
+                conn_type = ""
+                if conn_string:
+                    conn_parts = _parse_connection_string(conn_string)
+                    database = conn_parts.get("initial catalog", "")
+                    if not database:
+                        database = conn_parts.get("database", "")
+                    provider = conn_parts.get("provider", "")
+                    if provider:
+                        conn_type = provider
                 datasources.append(
                     DataSource(
                         name=name,
+                        connection_type=conn_type,
                         connection_string=conn_string,
+                        database=database,
                     )
                 )
                 logger.debug("PBIX: found data source '%s'", name)
@@ -203,10 +242,18 @@ class PbixParser(BaseParser):
                 name = col.get("name", "")
                 if not name:
                     continue
+                data_type = col.get("dataType", "")
+                description = col.get("description", "")
+                source_col = col.get("sourceColumn", "")
+                alias = source_col if source_col and source_col != name else ""
+                if not alias and description:
+                    alias = description
                 fields.append(
                     Field(
                         name=name,
-                        data_type=col.get("dataType", ""),
+                        alias=alias,
+                        data_type=data_type,
+                        role=_infer_role(data_type),
                         field_type="column",
                         datasource=table_name,
                     )
@@ -220,13 +267,16 @@ class PbixParser(BaseParser):
                 expression = measure.get("expression", "")
                 if isinstance(expression, list):
                     expression = "\n".join(expression)
+                description = measure.get("description", "")
                 fields.append(
                     Field(
                         name=name,
+                        alias=description,
                         field_type="measure",
+                        role="measure",
                         formula=expression,
                         original_formula=expression,
-                        formula_status="valid" if expression else "",
+                        formula_status="Success" if expression else "",
                         datasource=table_name,
                     )
                 )

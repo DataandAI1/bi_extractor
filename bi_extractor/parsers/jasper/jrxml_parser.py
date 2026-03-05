@@ -64,6 +64,18 @@ _BAND_TAGS = {
 # Regex to find $F{fieldName} references in expressions
 _FIELD_REF_RE = re.compile(r'\$F\{([^}]+)\}')
 
+# Numeric data types that indicate a measure role
+_NUMERIC_TYPES = {"integer", "float", "long", "double", "decimal"}
+
+
+def _infer_role(data_type: str) -> str:
+    """Infer dimension/measure role from normalized type."""
+    if not data_type:
+        return ""
+    if data_type.lower() in _NUMERIC_TYPES:
+        return "measure"
+    return "dimension"
+
 
 def _normalize_type(java_class: str) -> str:
     """Map a Java class name to a normalized type string."""
@@ -191,6 +203,8 @@ class JrxmlParser(BaseParser):
 
     def _extract_fields(self, root: ET.Element, result: ExtractionResult) -> None:
         """Extract <field> elements as Field objects with field_type='regular'."""
+        # Determine datasource name from result (set by _extract_datasource)
+        ds_name = result.datasources[0].name if result.datasources else ""
         for field_el in root.findall(f".//{_tag('field')}"):
             name = field_el.get("name", "").strip()
             if not name:
@@ -198,17 +212,22 @@ class JrxmlParser(BaseParser):
                 continue
             java_class = field_el.get("class", "")
             data_type = _normalize_type(java_class) if java_class else ""
+            description = _find_text(field_el, "fieldDescription")
             result.fields.append(
                 Field(
                     name=name,
+                    alias=description,
                     data_type=data_type,
+                    role=_infer_role(data_type),
                     field_type="regular",
+                    datasource=ds_name,
                 )
             )
         logger.debug("Extracted %d fields", sum(1 for f in result.fields if f.field_type == "regular"))
 
     def _extract_variables(self, root: ET.Element, result: ExtractionResult) -> None:
         """Extract <variable> elements as Field objects with field_type='calculated'."""
+        ds_name = result.datasources[0].name if result.datasources else ""
         for var_el in root.findall(f".//{_tag('variable')}"):
             name = var_el.get("name", "").strip()
             if not name:
@@ -221,9 +240,12 @@ class JrxmlParser(BaseParser):
                 Field(
                     name=name,
                     data_type=data_type,
+                    role=_infer_role(data_type),
                     field_type="calculated",
                     formula=formula,
                     original_formula=formula,
+                    formula_status="Success" if formula else "",
+                    datasource=ds_name,
                 )
             )
         logger.debug(

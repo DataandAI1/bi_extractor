@@ -185,10 +185,23 @@ class BirtParser(BaseParser):
                     col_name = _prop_value(struct, "name")
                     col_type = _prop_value(struct, "dataType")
                     if col_name:
+                        # Infer role from BIRT data types
+                        role = ""
+                        if col_type:
+                            lower_type = col_type.lower()
+                            if lower_type in (
+                                "integer", "float", "double", "decimal",
+                                "bigdecimal", "long", "short",
+                            ):
+                                role = "measure"
+                            else:
+                                role = "dimension"
                         fields.append(
                             Field(
                                 name=col_name,
                                 data_type=col_type,
+                                field_type="column",
+                                role=role,
                                 datasource=dataset_name,
                             )
                         )

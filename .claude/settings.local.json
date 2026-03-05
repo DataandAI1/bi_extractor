@@ -36,7 +36,10 @@
       "Bash(python -m pytest tests/test_pbix_parser.py -v)",
       "Bash(python -m pytest tests/test_qvf_parser.py -v)",
       "Bash(python -m pytest tests/test_qvf_parser.py tests/test_hyper_parser.py -v --tb=short)",
-      "Bash(python -m pytest tests/ -q --tb=short)"
+      "Bash(python -m pytest tests/ -q --tb=short)",
+      "Bash(python -m pytest tests/test_ssrs_parser.py -v --tb=short)",
+      "Bash(python -m pytest tests/test_pbix_parser.py -v --tb=short)",
+      "Bash(python -m pytest -q)"
     ]
   }
 }

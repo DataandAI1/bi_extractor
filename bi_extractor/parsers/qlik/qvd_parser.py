@@ -148,11 +148,19 @@ class QvdParser(BaseParser):
 
                 comment = _child_text(field_el, "Comment")
 
+                # Infer role from QVD data types
+                role = ""
+                if data_type in ("integer", "float", "money"):
+                    role = "measure"
+                elif data_type in ("string", "date", "time", "timestamp"):
+                    role = "dimension"
+
                 result.fields.append(
                     Field(
                         name=field_name,
                         alias=comment,
                         data_type=data_type,
+                        role=role,
                         field_type="column",
                         datasource=table_name,
                     )

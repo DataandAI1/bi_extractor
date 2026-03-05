@@ -4,8 +4,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
-
 from bi_extractor.parsers.microsoft.ssrs_parser import SsrsParser
 
 FIXTURES_DIR = Path(__file__).parent / "fixtures" / "ssrs"
@@ -55,7 +53,7 @@ class TestSsrsParserDataSources:
         assert self.result.errors == [], f"Unexpected errors: {self.result.errors}"
 
     def test_datasource_count(self) -> None:
-        assert len(self.result.datasources) == 2
+        assert len(self.result.datasources) == 3
 
     def test_first_datasource_name(self) -> None:
         names = [ds.name for ds in self.result.datasources]
@@ -65,15 +63,40 @@ class TestSsrsParserDataSources:
         names = [ds.name for ds in self.result.datasources]
         assert "HRDataSource" in names
 
+    def test_shared_datasource_name(self) -> None:
+        names = [ds.name for ds in self.result.datasources]
+        assert "SharedSource" in names
+
     def test_datasource_connection_type(self) -> None:
         ds_map = {ds.name: ds for ds in self.result.datasources}
         assert ds_map["SalesDB"].connection_type == "SQL"
         assert ds_map["HRDataSource"].connection_type == "OLEDB"
 
+    def test_shared_datasource_connection_type(self) -> None:
+        ds_map = {ds.name: ds for ds in self.result.datasources}
+        assert ds_map["SharedSource"].connection_type == "SharedDataSource"
+
+    def test_shared_datasource_connection_string(self) -> None:
+        ds_map = {ds.name: ds for ds in self.result.datasources}
+        assert ds_map["SharedSource"].connection_string == "/DataSources/CorporateDB"
+
     def test_datasource_connection_string(self) -> None:
         ds_map = {ds.name: ds for ds in self.result.datasources}
         assert "srv01" in ds_map["SalesDB"].connection_string
         assert "hr-srv" in ds_map["HRDataSource"].connection_string
+
+    def test_datasource_database_extracted(self) -> None:
+        ds_map = {ds.name: ds for ds in self.result.datasources}
+        assert ds_map["SalesDB"].database == "Sales"
+        assert ds_map["HRDataSource"].database == "HR"
+
+    def test_datasource_alias(self) -> None:
+        ds_map = {ds.name: ds for ds in self.result.datasources}
+        assert ds_map["SalesDB"].alias == "SalesDB"
+
+    def test_datasource_tables_from_sql(self) -> None:
+        ds_map = {ds.name: ds for ds in self.result.datasources}
+        assert "Orders" in ds_map["SalesDB"].tables
 
 
 class TestSsrsParserFields:
@@ -84,8 +107,8 @@ class TestSsrsParserFields:
         self.result = self.parser.parse(SAMPLE_RDL)
 
     def test_field_count(self) -> None:
-        # 4 fields in SalesDataSet + 3 fields in EmployeeDataSet = 7
-        assert len(self.result.fields) == 7
+        # 4 regular + 2 calculated in SalesDataSet + 3 regular in EmployeeDataSet = 9
+        assert len(self.result.fields) == 9
 
     def test_sales_field_names(self) -> None:
         names = [f.name for f in self.result.fields]
@@ -97,9 +120,29 @@ class TestSsrsParserFields:
         for expected in ("EmployeeID", "FullName", "Department"):
             assert expected in names
 
-    def test_field_type_is_regular(self) -> None:
-        for f in self.result.fields:
-            assert f.field_type == "regular"
+    def test_calculated_field_names(self) -> None:
+        names = [f.name for f in self.result.fields]
+        assert "TotalWithTax" in names
+        assert "DisplayName" in names
+
+    def test_regular_field_type(self) -> None:
+        field_map = {f.name: f for f in self.result.fields}
+        assert field_map["OrderID"].field_type == "regular"
+        assert field_map["CustomerName"].field_type == "regular"
+
+    def test_calculated_field_type(self) -> None:
+        field_map = {f.name: f for f in self.result.fields}
+        assert field_map["TotalWithTax"].field_type == "calculated"
+        assert field_map["DisplayName"].field_type == "calculated"
+
+    def test_calculated_field_formula(self) -> None:
+        field_map = {f.name: f for f in self.result.fields}
+        assert "Fields!Amount.Value" in field_map["TotalWithTax"].formula
+        assert "1.1" in field_map["TotalWithTax"].formula
+
+    def test_calculated_field_formula_status(self) -> None:
+        field_map = {f.name: f for f in self.result.fields}
+        assert field_map["TotalWithTax"].formula_status == "Success"
 
     def test_field_data_type_populated(self) -> None:
         field_map = {f.name: f for f in self.result.fields}
@@ -108,10 +151,28 @@ class TestSsrsParserFields:
         assert field_map["Amount"].data_type == "System.Decimal"
         assert field_map["OrderDate"].data_type == "System.DateTime"
 
+    def test_field_alias_from_datafield(self) -> None:
+        """DataField value should be used as alias when same as Name (empty)."""
+        field_map = {f.name: f for f in self.result.fields}
+        # When DataField equals Name, alias should be empty (no redundancy)
+        assert field_map["OrderID"].alias == ""
+        # Calculated fields have no DataField so no alias
+        assert field_map["TotalWithTax"].alias == ""
+
+    def test_field_role_inferred(self) -> None:
+        field_map = {f.name: f for f in self.result.fields}
+        # Numeric types → measure
+        assert field_map["OrderID"].role == "measure"
+        assert field_map["Amount"].role == "measure"
+        # String types → dimension
+        assert field_map["CustomerName"].role == "dimension"
+        assert field_map["Department"].role == "dimension"
+
     def test_field_datasource_reference(self) -> None:
         field_map = {f.name: f for f in self.result.fields}
         assert field_map["OrderID"].datasource == "SalesDB"
         assert field_map["EmployeeID"].datasource == "HRDataSource"
+        assert field_map["TotalWithTax"].datasource == "SalesDB"
 
 
 class TestSsrsParserParameters:
@@ -122,12 +183,13 @@ class TestSsrsParserParameters:
         self.result = self.parser.parse(SAMPLE_RDL)
 
     def test_parameter_count(self) -> None:
-        assert len(self.result.parameters) == 2
+        assert len(self.result.parameters) == 3
 
     def test_parameter_names(self) -> None:
         names = [p.name for p in self.result.parameters]
         assert "StartDate" in names
         assert "Region" in names
+        assert "InternalFilter" in names
 
     def test_startdate_data_type(self) -> None:
         param_map = {p.name: p for p in self.result.parameters}
@@ -148,6 +210,14 @@ class TestSsrsParserParameters:
     def test_region_prompt(self) -> None:
         param_map = {p.name: p for p in self.result.parameters}
         assert param_map["Region"].prompt_text == "Select Region"
+
+    def test_hidden_parameter_alias(self) -> None:
+        param_map = {p.name: p for p in self.result.parameters}
+        assert param_map["InternalFilter"].alias == "(Hidden)"
+
+    def test_hidden_parameter_default_value(self) -> None:
+        param_map = {p.name: p for p in self.result.parameters}
+        assert param_map["InternalFilter"].default_value == "0"
 
 
 class TestSsrsParserReportElements:
@@ -174,6 +244,51 @@ class TestSsrsParserReportElements:
         el_map = {el.name: el for el in self.result.report_elements}
         assert "ReportTitle" in el_map
         assert el_map["ReportTitle"].element_type == "TextBox"
+
+    def test_tablix_fields_used(self) -> None:
+        el_map = {el.name: el for el in self.result.report_elements}
+        tablix = el_map["SalesTablix"]
+        assert "OrderID" in tablix.fields_used
+        assert "CustomerName" in tablix.fields_used
+        assert "Amount" in tablix.fields_used
+        assert "TotalWithTax" in tablix.fields_used
+
+    def test_chart_fields_used(self) -> None:
+        el_map = {el.name: el for el in self.result.report_elements}
+        chart = el_map["SalesChart"]
+        assert "OrderDate" in chart.fields_used
+        assert "Amount" in chart.fields_used
+
+
+class TestSsrsParserFilters:
+    """Verify Filter extraction from DataSets and ReportItems."""
+
+    def setup_method(self) -> None:
+        self.parser = SsrsParser()
+        self.result = self.parser.parse(SAMPLE_RDL)
+
+    def test_filter_count(self) -> None:
+        assert len(self.result.filters) >= 2
+
+    def test_dataset_filter_extracted(self) -> None:
+        ds_filters = [f for f in self.result.filters if f.scope.startswith("dataset:")]
+        assert len(ds_filters) >= 1
+        assert any(f.field == "Amount" for f in ds_filters)
+
+    def test_dataset_filter_operator(self) -> None:
+        ds_filters = [f for f in self.result.filters if f.scope.startswith("dataset:")]
+        amount_filter = next(f for f in ds_filters if f.field == "Amount")
+        assert amount_filter.filter_type == "GreaterThan"
+
+    def test_tablix_filter_extracted(self) -> None:
+        tablix_filters = [f for f in self.result.filters if f.scope.startswith("tablix:")]
+        assert len(tablix_filters) >= 1
+        assert any(f.field == "OrderDate" for f in tablix_filters)
+
+    def test_tablix_filter_operator(self) -> None:
+        tablix_filters = [f for f in self.result.filters if f.scope.startswith("tablix:")]
+        date_filter = next(f for f in tablix_filters if f.field == "OrderDate")
+        assert date_filter.filter_type == "GreaterThanOrEqual"
 
 
 class TestSsrsParserMetadata:
@@ -259,9 +374,11 @@ class TestSsrsParserNamespaceFree:
       </Query>
       <Fields>
         <Field Name="Id">
+          <DataField>Id</DataField>
           <TypeName>System.Int32</TypeName>
         </Field>
         <Field Name="Name">
+          <DataField>Name</DataField>
           <TypeName>System.String</TypeName>
         </Field>
       </Fields>
@@ -290,14 +407,101 @@ class TestSsrsParserNamespaceFree:
         assert len(result.datasources) == 1
         assert result.datasources[0].name == "MyDS"
         assert result.datasources[0].connection_type == "SQL"
+        assert result.datasources[0].database == "TestDB"
 
         assert len(result.fields) == 2
         field_names = [f.name for f in result.fields]
         assert "Id" in field_names
         assert "Name" in field_names
 
+        # Verify role inference
+        field_map = {f.name: f for f in result.fields}
+        assert field_map["Id"].role == "measure"
+        assert field_map["Name"].role == "dimension"
+
         assert len(result.parameters) == 1
         assert result.parameters[0].name == "Filter"
 
         assert len(result.report_elements) == 1
         assert result.report_elements[0].name == "ItemsTablix"
+
+
+class TestSsrsParserCalculatedFields:
+    """Verify calculated field extraction with Value expressions."""
+
+    def test_calculated_field_with_expression(self, tmp_path: Path) -> None:
+        rdl_content = """<?xml version="1.0" encoding="utf-8"?>
+<Report>
+  <DataSets>
+    <DataSet Name="DS1">
+      <Query>
+        <DataSourceName>DS</DataSourceName>
+        <CommandText>SELECT Price, Quantity FROM Products</CommandText>
+      </Query>
+      <Fields>
+        <Field Name="Price">
+          <DataField>Price</DataField>
+          <TypeName>System.Decimal</TypeName>
+        </Field>
+        <Field Name="Quantity">
+          <DataField>Quantity</DataField>
+          <TypeName>System.Int32</TypeName>
+        </Field>
+        <Field Name="Total">
+          <Value>=Fields!Price.Value * Fields!Quantity.Value</Value>
+          <TypeName>System.Decimal</TypeName>
+        </Field>
+      </Fields>
+    </DataSet>
+  </DataSets>
+</Report>
+"""
+        rdl_file = tmp_path / "calc.rdl"
+        rdl_file.write_text(rdl_content, encoding="utf-8")
+
+        parser = SsrsParser()
+        result = parser.parse(rdl_file)
+
+        assert result.errors == []
+        assert len(result.fields) == 3
+
+        field_map = {f.name: f for f in result.fields}
+
+        # Regular fields
+        assert field_map["Price"].field_type == "regular"
+        assert field_map["Price"].formula == ""
+
+        # Calculated field
+        total = field_map["Total"]
+        assert total.field_type == "calculated"
+        assert "Fields!Price.Value" in total.formula
+        assert "Fields!Quantity.Value" in total.formula
+        assert total.formula_status == "Success"
+        assert total.alias == ""  # No DataField for calculated fields
+
+
+class TestSsrsParserSharedDataSource:
+    """Verify shared datasource reference extraction."""
+
+    def test_shared_datasource_reference(self, tmp_path: Path) -> None:
+        rdl_content = """<?xml version="1.0" encoding="utf-8"?>
+<Report>
+  <DataSources>
+    <DataSource Name="SharedDS">
+      <DataSourceReference>/DataSources/MySharedDB</DataSourceReference>
+    </DataSource>
+  </DataSources>
+</Report>
+"""
+        rdl_file = tmp_path / "shared.rdl"
+        rdl_file.write_text(rdl_content, encoding="utf-8")
+
+        parser = SsrsParser()
+        result = parser.parse(rdl_file)
+
+        assert result.errors == []
+        assert len(result.datasources) == 1
+        ds = result.datasources[0]
+        assert ds.name == "SharedDS"
+        assert ds.connection_type == "SharedDataSource"
+        assert ds.connection_string == "/DataSources/MySharedDB"
