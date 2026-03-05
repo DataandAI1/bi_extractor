@@ -71,6 +71,32 @@ def to_flat_rows(results: list[ExtractionResult]) -> list[dict[str, str]]:
             for field_name in element.fields_used:
                 field_worksheets.setdefault(field_name, []).append(element.name)
 
+        if not result.fields:
+            # Emit a row to ensure the file and any errors are present in the export
+            rows.append({
+                "Column ID": str(column_id),
+                "Column Name": "",
+                "Column Alias": "",
+                "Field Type": "",
+                "Connection Name": "",
+                "Connection Alias": "",
+                "datatype": "",
+                "role": "",
+                "Calculation Formula": "",
+                "Original Calculation": "",
+                "Calc Clean Status": "",
+                "Field Used in Worksheets": "",
+                "Worksheet Name": "",
+                "File Name": Path(result.source_file).name,
+                "Tool": result.tool_name,
+                "File Type": result.file_type,
+                "Parameter Count": str(len(result.parameters)),
+                "Relationship Count": str(len(result.relationships)),
+                "Extraction Errors": "; ".join(result.errors) if result.errors else "",
+            })
+            column_id += 1
+            continue
+
         for field in result.fields:
             worksheets = field_worksheets.get(field.name, [])
             conn_name, conn_alias = connections.get(

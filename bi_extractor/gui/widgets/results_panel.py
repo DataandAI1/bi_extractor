@@ -147,6 +147,13 @@ class ResultsPanel(ttk.LabelFrame):
         )
         self._truncation_label.pack(side=tk.RIGHT)
 
+        # Error label at the bottom of the detail frame
+        self._error_label = ttk.Label(
+            detail_frame, text="", foreground="red", justify="left", wraplength=800
+        )
+        self._error_label.pack(side=tk.BOTTOM, fill=tk.X, pady=(4, 0))
+
+
         detail_col_ids = [c[0] for c in self._DETAIL_COLS]
         self._detail_tree = ttk.Treeview(
             detail_frame, columns=detail_col_ids, show="headings", height=8
@@ -258,6 +265,13 @@ class ResultsPanel(ttk.LabelFrame):
             self._truncated = False
             self._truncation_label.config(text="")
 
+        if result.errors:
+            error_text = "Errors:\n" + "\n".join(f"- {e}" for e in result.errors)
+            self._error_label.config(text=error_text)
+        else:
+            self._error_label.config(text="")
+
+
         for field in fields:
             formula_display = field.formula
             if len(formula_display) > 80:
@@ -279,6 +293,7 @@ class ResultsPanel(ttk.LabelFrame):
         self._detail_tree.delete(*self._detail_tree.get_children())
         self._detail_title.config(text="Select a file above to view field details")
         self._truncation_label.config(text="")
+        self._error_label.config(text="")
         self._truncated = False
         self._tooltip.hide()
 

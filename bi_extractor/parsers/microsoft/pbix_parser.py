@@ -146,13 +146,31 @@ class PbixParser(BaseParser):
             return None
         try:
             raw = zf.read(entry_name)
+            
             # Power BI sometimes writes UTF-16 LE with BOM; detect by BOM bytes
             if raw[:2] in (b"\xff\xfe", b"\xfe\xff"):
                 text = raw.decode("utf-16").lstrip("\ufeff")
+            elif len(raw) >= 2 and raw[0] in (b"{"[0], b"["[0]) and raw[1] == 0:
+                # UTF-16LE without BOM (common in Report/Layout)
+                text = raw.decode("utf-16le")
             else:
                 # Standard UTF-8 (with or without BOM)
                 text = raw.decode("utf-8-sig")
-            return json.loads(text)  # type: ignore[no-any-return]
+                
+            # Clean up trailing nulls which Power BI sometimes appends
+            text = text.strip("\x00")
+            
+            try:
+                parsed = json.loads(text)
+            except json.JSONDecodeError:
+                # Fallback: if interpreted as UTF-8 but contains nulls, it might be UTF-16LE
+                if "\x00" in text:
+                    text = raw.decode("utf-16le").strip("\x00")
+                    parsed = json.loads(text)
+                else:
+                    raise
+                    
+            return parsed  # type: ignore[no-any-return]
         except json.JSONDecodeError as exc:
             msg = f"JSON parse error in {entry_name} ({source}): {exc}"
             logger.error(msg)

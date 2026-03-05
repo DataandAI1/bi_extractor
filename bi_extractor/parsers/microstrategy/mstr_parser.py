@@ -124,22 +124,43 @@ class MstrParser(BaseParser):
         # Try ZIP archive first.
         try:
             with zipfile.ZipFile(file_path, "r") as zf:
-                xml_names = [n for n in zf.namelist() if n.lower().endswith(".xml")]
-                if not xml_names:
-                    msg = f"No XML files found in ZIP archive: {file_str}"
-                    logger.warning(msg)
-                    result.errors.append(msg)
-                    return []
                 roots: list[ET.Element] = []
-                for name in xml_names:
+                
+                # MSTR dossiers can contain binary data, XML metadata, and cubes.
+                # Skip known binary/data extensions to avoid reading huge datasets
+                skip_exts = (".cube", ".delta", ".png", ".jpg", ".jpeg", ".gif", ".mp4", ".pdf", ".bin")
+                
+                for name in zf.namelist():
+                    if name.lower().endswith(skip_exts):
+                        continue
+                        
+                    # Quick heuristic to avoid reading huge binary blobs into memory
+                    # Also handles files with no extension that might actually be XML definitions
+                    try:
+                        with zf.open(name) as f:
+                            peek = f.read(100).lstrip()
+                            # Check if it looks like XML (starts with '<' or UTF-8 BOM + '<')
+                            if not peek.startswith(b"<") and not peek.startswith(b"\xef\xbb\xbf<"):
+                                continue
+                    except Exception:
+                        continue
+                        
                     try:
                         data = zf.read(name)
                         root = ET.fromstring(data)  # noqa: S314
                         roots.append(root)
                     except ET.ParseError as exc:
-                        msg = f"XML parse error in {name} within {file_str}: {exc}"
-                        logger.error(msg)
-                        result.errors.append(msg)
+                        # Only log errors if the file explicitly claimed to be XML, reduce noise
+                        if name.lower().endswith(".xml"):
+                            msg = f"XML parse error in {name} within {file_str}: {exc}"
+                            logger.error(msg)
+                            result.errors.append(msg)
+                            
+                if not roots:
+                    msg = f"No valid XML metadata found in ZIP archive: {file_str}"
+                    logger.warning(msg)
+                    result.errors.append(msg)
+                    return []
                 return roots
         except zipfile.BadZipFile:
             logger.debug("%s is not a ZIP archive, trying plain XML", file_str)
