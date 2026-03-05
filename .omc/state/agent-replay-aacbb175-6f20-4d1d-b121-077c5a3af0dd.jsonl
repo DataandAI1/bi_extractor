@@ -1,0 +1,10 @@
+{"t":0,"agent":"system","event":"keyword_detected","keyword":"ralplan"}
+{"t":0,"agent":"a8b6cd5","agent_type":"Explore","event":"agent_start","parent_mode":"none"}
+{"t":0,"agent":"a8b6cd5","agent_type":"Explore","event":"agent_stop","success":true,"duration_ms":320370}
+{"t":0,"agent":"aa6c04d","agent_type":"planner","event":"agent_start","parent_mode":"none"}
+{"t":0,"agent":"aa6c04d","agent_type":"planner","event":"agent_stop","success":true,"duration_ms":248492}
+{"t":0,"agent":"a443060","agent_type":"architect","event":"agent_start","parent_mode":"none"}
+{"t":0,"agent":"a9db194","agent_type":"critic","event":"agent_start","parent_mode":"none"}
+{"t":0,"agent":"a9db194","agent_type":"critic","event":"agent_stop","success":true,"duration_ms":122065}
+{"t":0,"agent":"a443060","agent_type":"architect","event":"agent_stop","success":true,"duration_ms":183537}
+{"t":0,"agent":"system","event":"skill_invoked","skill_name":"oh-my-claudecode:ralph"}

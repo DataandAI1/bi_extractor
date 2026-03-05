@@ -32,6 +32,7 @@ tableau-hyper = ["tableauhyperapi>=0.0.19"]
 crystal = ["pywin32>=306; sys_platform == 'win32'"]
 qlik = ["javaobj-py3>=0.4"]
 cognos = ["cabarchive>=0.2"]
+gui = ["tkinterdnd2>=0.4"]
 api = ["requests>=2.31", "mstrio-py>=11.3"]
 all = [
     "openpyxl>=3.1",
@@ -50,6 +51,7 @@ dev = [
 
 [project.scripts]
 bi-extractor = "bi_extractor.cli.main:main"
+bi-extractor-gui = "bi_extractor.gui:launch_gui"
 
 [tool.setuptools.packages.find]
 include = ["bi_extractor*"]

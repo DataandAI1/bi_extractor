@@ -24,7 +24,11 @@
       "Bash(python -m pytest tests/test_cognos_cpf_parser.py tests/test_cognos_deployment_parser.py -v)",
       "Bash(python -m pytest -v)",
       "Bash(python -c \":*)",
-      "mcp__plugin_oh-my-claudecode_t__state_clear"
+      "mcp__plugin_oh-my-claudecode_t__state_clear",
+      "Bash(python -c \"from bi_extractor.core.registry import get_registry; r = get_registry\\(\\); [print\\(f\"\"{p[''tool'']:25} | {'', ''.join\\(p[''extensions'']\\)} | {''Yes'' if p[''available''] else ''No''}\"\"\\) for p in r.list_parsers\\(\\)]\")",
+      "Bash(python -c \"import tkinter; print\\(''tkinter version:'', tkinter.TkVersion\\)\")",
+      "Bash(python -m pytest --co -q)",
+      "Bash(python -c \"import tkinterdnd2; print\\(''tkinterdnd2 available''\\)\")"
     ]
   }
 }

@@ -34,33 +34,57 @@
   "directoryMap": {},
   "hotPaths": [
     {
+      "path": "pyproject.toml",
+      "accessCount": 15,
+      "lastAccessed": 1772680190774,
+      "type": "file"
+    },
+    {
+      "path": "bi_extractor\\core\\models.py",
+      "accessCount": 14,
+      "lastAccessed": 1772679959351,
+      "type": "file"
+    },
+    {
+      "path": "tests\\conftest.py",
+      "accessCount": 11,
+      "lastAccessed": 1772679541574,
+      "type": "file"
+    },
+    {
       "path": "bi_extractor\\parsers\\cognos\\deployment_parser.py",
       "accessCount": 10,
       "lastAccessed": 1772669776432,
       "type": "file"
     },
     {
-      "path": "bi_extractor\\core\\models.py",
-      "accessCount": 9,
-      "lastAccessed": 1772669647435,
-      "type": "file"
+      "path": "",
+      "accessCount": 10,
+      "lastAccessed": 1772679532857,
+      "type": "directory"
     },
     {
-      "path": "tests\\conftest.py",
-      "accessCount": 9,
-      "lastAccessed": 1772669659431,
-      "type": "file"
-    },
-    {
-      "path": "pyproject.toml",
-      "accessCount": 8,
-      "lastAccessed": 1772669642280,
+      "path": "bi_extractor\\core\\registry.py",
+      "accessCount": 10,
+      "lastAccessed": 1772679965510,
       "type": "file"
     },
     {
       "path": "bi_extractor\\parsers\\base.py",
-      "accessCount": 8,
-      "lastAccessed": 1772669647066,
+      "accessCount": 9,
+      "lastAccessed": 1772679215513,
+      "type": "file"
+    },
+    {
+      "path": "bi_extractor\\core\\engine.py",
+      "accessCount": 7,
+      "lastAccessed": 1772679959191,
+      "type": "file"
+    },
+    {
+      "path": "bi_extractor\\output\\csv_formatter.py",
+      "accessCount": 7,
+      "lastAccessed": 1772679964598,
       "type": "file"
     },
     {
@@ -70,21 +94,15 @@
       "type": "file"
     },
     {
-      "path": "",
+      "path": "bi_extractor\\gui\\__init__.py",
       "accessCount": 6,
-      "lastAccessed": 1772667459896,
-      "type": "directory"
+      "lastAccessed": 1772679994580,
+      "type": "file"
     },
     {
       "path": "tests\\test_base_parser.py",
       "accessCount": 5,
       "lastAccessed": 1772667456199,
-      "type": "file"
-    },
-    {
-      "path": "bi_extractor\\core\\registry.py",
-      "accessCount": 5,
-      "lastAccessed": 1772669647796,
       "type": "file"
     },
     {
@@ -94,15 +112,27 @@
       "type": "file"
     },
     {
-      "path": "README.md",
-      "accessCount": 3,
-      "lastAccessed": 1772666319703,
+      "path": "bi_extractor\\output\\base.py",
+      "accessCount": 5,
+      "lastAccessed": 1772679532506,
       "type": "file"
     },
     {
-      "path": "bi_extractor\\core\\engine.py",
+      "path": "bi_extractor\\core\\errors.py",
+      "accessCount": 4,
+      "lastAccessed": 1772679504624,
+      "type": "file"
+    },
+    {
+      "path": "bi_extractor\\cli\\main.py",
+      "accessCount": 4,
+      "lastAccessed": 1772679512643,
+      "type": "file"
+    },
+    {
+      "path": "README.md",
       "accessCount": 3,
-      "lastAccessed": 1772667442033,
+      "lastAccessed": 1772666319703,
       "type": "file"
     },
     {
@@ -116,18 +146,6 @@
       "accessCount": 3,
       "lastAccessed": 1772669668674,
       "type": "directory"
-    },
-    {
-      "path": "bi_extractor\\output\\base.py",
-      "accessCount": 2,
-      "lastAccessed": 1772667303739,
-      "type": "file"
-    },
-    {
-      "path": "bi_extractor\\output\\csv_formatter.py",
-      "accessCount": 2,
-      "lastAccessed": 1772667443071,
-      "type": "file"
     },
     {
       "path": "bi_extractor\\cli\\__init__.py",
@@ -145,12 +163,6 @@
       "path": "tests\\fixtures\\oracle\\sample.xdo",
       "accessCount": 2,
       "lastAccessed": 1772669175299,
-      "type": "file"
-    },
-    {
-      "path": "bi_extractor\\core\\errors.py",
-      "accessCount": 2,
-      "lastAccessed": 1772669648178,
       "type": "file"
     },
     {
@@ -185,8 +197,14 @@
     },
     {
       "path": "bi_extractor\\__init__.py",
-      "accessCount": 1,
-      "lastAccessed": 1772666975586,
+      "accessCount": 2,
+      "lastAccessed": 1772679224959,
+      "type": "file"
+    },
+    {
+      "path": "tests\\test_cli.py",
+      "accessCount": 2,
+      "lastAccessed": 1772679541553,
       "type": "file"
     },
     {
@@ -199,12 +217,6 @@
       "path": "bi_extractor\\output\\__init__.py",
       "accessCount": 1,
       "lastAccessed": 1772666979031,
-      "type": "file"
-    },
-    {
-      "path": "bi_extractor\\gui\\__init__.py",
-      "accessCount": 1,
-      "lastAccessed": 1772666981364,
       "type": "file"
     },
     {
@@ -280,12 +292,6 @@
       "type": "file"
     },
     {
-      "path": "bi_extractor\\cli\\main.py",
-      "accessCount": 1,
-      "lastAccessed": 1772667503032,
-      "type": "file"
-    },
-    {
       "path": "tests\\test_tds_parser.py",
       "accessCount": 1,
       "lastAccessed": 1772667513241,
@@ -319,12 +325,6 @@
       "path": "tests\\test_jrxml_parser.py",
       "accessCount": 1,
       "lastAccessed": 1772667556119,
-      "type": "file"
-    },
-    {
-      "path": "tests\\test_cli.py",
-      "accessCount": 1,
-      "lastAccessed": 1772667562658,
       "type": "file"
     },
     {
