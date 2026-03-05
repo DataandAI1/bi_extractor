@@ -49,3 +49,21 @@ def oracle_fixtures_dir(fixtures_dir: Path) -> Path:
 def cognos_fixtures_dir(fixtures_dir: Path) -> Path:
     """Return the path to IBM Cognos test fixtures."""
     return fixtures_dir / "cognos"
+
+
+@pytest.fixture
+def powerbi_fixtures_dir(fixtures_dir: Path) -> Path:
+    """Return the path to Power BI test fixtures."""
+    return fixtures_dir / "powerbi"
+
+
+@pytest.fixture
+def qlik_fixtures_dir(fixtures_dir: Path) -> Path:
+    """Return the path to Qlik test fixtures."""
+    return fixtures_dir / "qlik"
+
+
+@pytest.fixture
+def microstrategy_fixtures_dir(fixtures_dir: Path) -> Path:
+    """Return the path to MicroStrategy test fixtures."""
+    return fixtures_dir / "microstrategy"

@@ -28,7 +28,15 @@
       "Bash(python -c \"from bi_extractor.core.registry import get_registry; r = get_registry\\(\\); [print\\(f\"\"{p[''tool'']:25} | {'', ''.join\\(p[''extensions'']\\)} | {''Yes'' if p[''available''] else ''No''}\"\"\\) for p in r.list_parsers\\(\\)]\")",
       "Bash(python -c \"import tkinter; print\\(''tkinter version:'', tkinter.TkVersion\\)\")",
       "Bash(python -m pytest --co -q)",
-      "Bash(python -c \"import tkinterdnd2; print\\(''tkinterdnd2 available''\\)\")"
+      "Bash(python -c \"import tkinterdnd2; print\\(''tkinterdnd2 available''\\)\")",
+      "Bash(python -m pytest tests/test_qvd_parser.py -v)",
+      "Bash(python -m pytest tests/test_mstr_parser.py -v)",
+      "Bash(python -m pytest tests/test_hyper_parser.py -v)",
+      "Bash(python -m pytest --tb=short -q)",
+      "Bash(python -m pytest tests/test_pbix_parser.py -v)",
+      "Bash(python -m pytest tests/test_qvf_parser.py -v)",
+      "Bash(python -m pytest tests/test_qvf_parser.py tests/test_hyper_parser.py -v --tb=short)",
+      "Bash(python -m pytest tests/ -q --tb=short)"
     ]
   }
 }
