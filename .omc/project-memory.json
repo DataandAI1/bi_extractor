@@ -34,21 +34,39 @@
   "directoryMap": {},
   "hotPaths": [
     {
+      "path": "bi_extractor\\parsers\\cognos\\deployment_parser.py",
+      "accessCount": 10,
+      "lastAccessed": 1772669776432,
+      "type": "file"
+    },
+    {
       "path": "bi_extractor\\core\\models.py",
-      "accessCount": 7,
-      "lastAccessed": 1772667452039,
+      "accessCount": 9,
+      "lastAccessed": 1772669647435,
+      "type": "file"
+    },
+    {
+      "path": "tests\\conftest.py",
+      "accessCount": 9,
+      "lastAccessed": 1772669659431,
+      "type": "file"
+    },
+    {
+      "path": "pyproject.toml",
+      "accessCount": 8,
+      "lastAccessed": 1772669642280,
+      "type": "file"
+    },
+    {
+      "path": "bi_extractor\\parsers\\base.py",
+      "accessCount": 8,
+      "lastAccessed": 1772669647066,
       "type": "file"
     },
     {
       "path": "tableau_metadata_extractor.py",
       "accessCount": 6,
       "lastAccessed": 1772667400813,
-      "type": "file"
-    },
-    {
-      "path": "bi_extractor\\parsers\\base.py",
-      "accessCount": 6,
-      "lastAccessed": 1772667429251,
       "type": "file"
     },
     {
@@ -64,15 +82,15 @@
       "type": "file"
     },
     {
-      "path": "tests\\conftest.py",
+      "path": "bi_extractor\\core\\registry.py",
       "accessCount": 5,
-      "lastAccessed": 1772667463452,
+      "lastAccessed": 1772669647796,
       "type": "file"
     },
     {
-      "path": "pyproject.toml",
-      "accessCount": 4,
-      "lastAccessed": 1772667463164,
+      "path": "bi_extractor\\parsers\\cognos\\cpf_parser.py",
+      "accessCount": 5,
+      "lastAccessed": 1772669770170,
       "type": "file"
     },
     {
@@ -88,10 +106,16 @@
       "type": "file"
     },
     {
-      "path": "bi_extractor\\core\\registry.py",
+      "path": "bi_extractor\\parsers\\oracle\\xdo_parser.py",
       "accessCount": 3,
-      "lastAccessed": 1772667442391,
+      "lastAccessed": 1772669654324,
       "type": "file"
+    },
+    {
+      "path": "bi_extractor\\parsers",
+      "accessCount": 3,
+      "lastAccessed": 1772669668674,
+      "type": "directory"
     },
     {
       "path": "bi_extractor\\output\\base.py",
@@ -112,6 +136,54 @@
       "type": "file"
     },
     {
+      "path": "tests\\test_xdo_parser.py",
+      "accessCount": 2,
+      "lastAccessed": 1772669175225,
+      "type": "file"
+    },
+    {
+      "path": "tests\\fixtures\\oracle\\sample.xdo",
+      "accessCount": 2,
+      "lastAccessed": 1772669175299,
+      "type": "file"
+    },
+    {
+      "path": "bi_extractor\\core\\errors.py",
+      "accessCount": 2,
+      "lastAccessed": 1772669648178,
+      "type": "file"
+    },
+    {
+      "path": "bi_extractor\\parsers\\__init__.py",
+      "accessCount": 2,
+      "lastAccessed": 1772669648561,
+      "type": "file"
+    },
+    {
+      "path": "bi_extractor\\parsers\\cognos\\__init__.py",
+      "accessCount": 2,
+      "lastAccessed": 1772669649032,
+      "type": "file"
+    },
+    {
+      "path": "bi_extractor\\parsers\\tableau\\twb_parser.py",
+      "accessCount": 2,
+      "lastAccessed": 1772669653963,
+      "type": "file"
+    },
+    {
+      "path": "bi_extractor\\parsers\\eclipse\\birt_parser.py",
+      "accessCount": 2,
+      "lastAccessed": 1772669654861,
+      "type": "file"
+    },
+    {
+      "path": "bi_extractor\\parsers\\microsoft\\ssrs_parser.py",
+      "accessCount": 2,
+      "lastAccessed": 1772669663445,
+      "type": "file"
+    },
+    {
       "path": "bi_extractor\\__init__.py",
       "accessCount": 1,
       "lastAccessed": 1772666975586,
@@ -121,12 +193,6 @@
       "path": "bi_extractor\\core\\__init__.py",
       "accessCount": 1,
       "lastAccessed": 1772666976733,
-      "type": "file"
-    },
-    {
-      "path": "bi_extractor\\parsers\\__init__.py",
-      "accessCount": 1,
-      "lastAccessed": 1772666977884,
       "type": "file"
     },
     {
@@ -142,12 +208,6 @@
       "type": "file"
     },
     {
-      "path": "bi_extractor\\core\\errors.py",
-      "accessCount": 1,
-      "lastAccessed": 1772667091473,
-      "type": "file"
-    },
-    {
       "path": "tests\\test_models.py",
       "accessCount": 1,
       "lastAccessed": 1772667134755,
@@ -158,12 +218,6 @@
       "accessCount": 1,
       "lastAccessed": 1772667344438,
       "type": "file"
-    },
-    {
-      "path": "bi_extractor\\parsers",
-      "accessCount": 1,
-      "lastAccessed": 1772667405203,
-      "type": "directory"
     },
     {
       "path": "bi_extractor\\parsers\\tableau\\__init__.py",
@@ -202,18 +256,6 @@
       "type": "file"
     },
     {
-      "path": "bi_extractor\\parsers\\microsoft\\ssrs_parser.py",
-      "accessCount": 1,
-      "lastAccessed": 1772667466287,
-      "type": "file"
-    },
-    {
-      "path": "bi_extractor\\parsers\\tableau\\twb_parser.py",
-      "accessCount": 1,
-      "lastAccessed": 1772667468294,
-      "type": "file"
-    },
-    {
       "path": "tests\\fixtures\\tableau\\sample.tds",
       "accessCount": 1,
       "lastAccessed": 1772667472795,
@@ -229,12 +271,6 @@
       "path": "bi_extractor\\parsers\\jasper\\jrxml_parser.py",
       "accessCount": 1,
       "lastAccessed": 1772667489447,
-      "type": "file"
-    },
-    {
-      "path": "bi_extractor\\parsers\\eclipse\\birt_parser.py",
-      "accessCount": 1,
-      "lastAccessed": 1772667493826,
       "type": "file"
     },
     {
@@ -274,21 +310,9 @@
       "type": "file"
     },
     {
-      "path": "bi_extractor\\parsers\\oracle\\xdo_parser.py",
-      "accessCount": 1,
-      "lastAccessed": 1772667532050,
-      "type": "file"
-    },
-    {
       "path": "tests\\fixtures\\birt\\sample.rptdesign",
       "accessCount": 1,
       "lastAccessed": 1772667550547,
-      "type": "file"
-    },
-    {
-      "path": "tests\\fixtures\\oracle\\sample.xdo",
-      "accessCount": 1,
-      "lastAccessed": 1772667555888,
       "type": "file"
     },
     {
@@ -307,12 +331,6 @@
       "path": "tests\\test_birt_parser.py",
       "accessCount": 1,
       "lastAccessed": 1772667578891,
-      "type": "file"
-    },
-    {
-      "path": "tests\\test_xdo_parser.py",
-      "accessCount": 1,
-      "lastAccessed": 1772667603275,
       "type": "file"
     }
   ],

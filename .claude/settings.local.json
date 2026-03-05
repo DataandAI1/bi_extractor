@@ -19,7 +19,12 @@
       "Bash(python -m pytest tests/test_cli.py -v --tb=short)",
       "Bash(python -m pytest tests/test_birt_parser.py tests/test_xdo_parser.py -v)",
       "Bash(python -c \"from bi_extractor.parsers.jasper.jrxml_parser import JrxmlParser; p = JrxmlParser\\(\\); print\\(''imports ok, tool='', p.tool, ''extensions='', p.extensions\\)\")",
-      "Bash(python -m pytest tests/ -v --tb=short)"
+      "Bash(python -m pytest tests/ -v --tb=short)",
+      "Bash(xargs wc -l)",
+      "Bash(python -m pytest tests/test_cognos_cpf_parser.py tests/test_cognos_deployment_parser.py -v)",
+      "Bash(python -m pytest -v)",
+      "Bash(python -c \":*)",
+      "mcp__plugin_oh-my-claudecode_t__state_clear"
     ]
   }
 }

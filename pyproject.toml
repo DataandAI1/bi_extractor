@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "bi-extractor"
 version = "0.1.0"
-description = "Universal BI Report Metadata Extractor - extract metadata from Tableau, Power BI, SSRS, Crystal Reports, Qlik, JasperReports, BIRT, Oracle BI, SAP BO, Pentaho, and MicroStrategy report files"
+description = "Universal BI Report Metadata Extractor - extract metadata from Tableau, Power BI, SSRS, Crystal Reports, Qlik, JasperReports, BIRT, Oracle BI, SAP BO, Pentaho, MicroStrategy, and IBM Cognos report files"
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.10"
@@ -31,12 +31,14 @@ excel = ["openpyxl>=3.1"]
 tableau-hyper = ["tableauhyperapi>=0.0.19"]
 crystal = ["pywin32>=306; sys_platform == 'win32'"]
 qlik = ["javaobj-py3>=0.4"]
+cognos = ["cabarchive>=0.2"]
 api = ["requests>=2.31", "mstrio-py>=11.3"]
 all = [
     "openpyxl>=3.1",
     "tableauhyperapi>=0.0.19",
     "pywin32>=306; sys_platform == 'win32'",
     "javaobj-py3>=0.4",
+    "cabarchive>=0.2",
     "requests>=2.31",
     "mstrio-py>=11.3",
 ]

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="SalesModel" description="Sales analytics metadata model">
+  <dataSources>
+    <dataSource name="SalesDB" connectionType="ODBC" connectionString="DSN=SalesDB;UID=analyst;PWD=pass">
+      <schema name="dbo">
+        <table name="orders"/>
+        <table name="customers"/>
+        <table name="products"/>
+      </schema>
+    </dataSource>
+  </dataSources>
+  <querySubjects>
+    <querySubject name="Orders" dataSource="SalesDB">
+      <queryItem name="OrderID" dataType="integer" expression="[orders].[order_id]"/>
+      <queryItem name="OrderDate" dataType="date" expression="[orders].[order_date]"/>
+      <queryItem name="Amount" dataType="decimal" expression="[orders].[amount]"/>
+      <queryItem name="CustomerID" dataType="integer" expression="[orders].[customer_id]"/>
+    </querySubject>
+    <querySubject name="Customers" dataSource="SalesDB">
+      <queryItem name="CustomerID" dataType="integer" expression="[customers].[customer_id]"/>
+      <queryItem name="CustomerName" dataType="varchar" expression="[customers].[name]" alias="Customer Name"/>
+      <queryItem name="Region" dataType="varchar" expression="[customers].[region]"/>
+    </querySubject>
+  </querySubjects>
+  <relationships>
+    <relationship name="Orders_Customers"
+                  leftQuerySubject="Orders" rightQuerySubject="Customers"
+                  joinType="inner"
+                  leftItem="CustomerID" rightItem="CustomerID"/>
+  </relationships>
+  <parameters>
+    <parameter name="p_startDate" dataType="date" defaultValue="2024-01-01" promptText="Start Date"/>
+    <parameter name="p_region" dataType="varchar" promptText="Region"/>
+  </parameters>
+  <filters>
+    <filter name="DateRange" expression="[Orders].[OrderDate] &gt;= ?p_startDate?" scope="report"/>
+  </filters>
+</project>

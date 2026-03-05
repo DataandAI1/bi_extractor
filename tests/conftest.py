@@ -43,3 +43,9 @@ def birt_fixtures_dir(fixtures_dir: Path) -> Path:
 def oracle_fixtures_dir(fixtures_dir: Path) -> Path:
     """Return the path to Oracle BI test fixtures."""
     return fixtures_dir / "oracle"
+
+
+@pytest.fixture
+def cognos_fixtures_dir(fixtures_dir: Path) -> Path:
+    """Return the path to IBM Cognos test fixtures."""
+    return fixtures_dir / "cognos"
