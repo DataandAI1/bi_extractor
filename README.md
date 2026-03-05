@@ -7,7 +7,8 @@ A universal metadata extraction tool for Business Intelligence (BI) report files
 | Tool | Supported Extensions |
 | :--- | :--- |
 | **Tableau** | .twb, .twbx, .tds, .tdsx |
-| **Microsoft SSRS** | .rdl, .rdlc |
+| **Microsoft SSRS / Power BI Paginated** | .rdl, .rdlc |
+| **IBM Cognos Analytics** | .cab (deployment archives), .cpf (Framework Manager projects) |
 | **JasperReports** | .jrxml |
 | **BIRT** | .rptdesign |
 | **Oracle BI Publisher** | .xdo, .xdoz |
