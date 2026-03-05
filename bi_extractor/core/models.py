@@ -95,6 +95,17 @@ class Relationship:
 
 
 @dataclass(slots=True)
+class SQLQuery:
+    """An embedded SQL query extracted from a report definition."""
+
+    name: str
+    sql_text: str
+    datasource: str = ""
+    dataset: str = ""
+    tables_referenced: list[str] = field(default_factory=list)
+
+
+@dataclass(slots=True)
 class ExtractionResult:
     """Complete extraction result for a single report file.
 
@@ -112,6 +123,7 @@ class ExtractionResult:
     parameters: list[Parameter] = field(default_factory=list)
     relationships: list[Relationship] = field(default_factory=list)
     filters: list[Filter] = field(default_factory=list)
+    sql_queries: list[SQLQuery] = field(default_factory=list)
     errors: list[str] = field(default_factory=list)
     metadata: dict[str, Any] = field(default_factory=dict)
 

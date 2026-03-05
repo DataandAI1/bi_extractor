@@ -1,17 +1,32 @@
 {
   "version": "1.0.0",
-  "lastScanned": 1772665143180,
-  "projectRoot": "c:\\Users\\reyno\\Documents\\Projects\\Extractor\\Tableau_Extractor",
+  "lastScanned": 1772751751419,
+  "projectRoot": "C:\\Users\\reyno\\Documents\\Projects\\bi_extractor",
   "techStack": {
-    "languages": [],
-    "frameworks": [],
+    "languages": [
+      {
+        "name": "Python",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "pyproject.toml"
+        ]
+      }
+    ],
+    "frameworks": [
+      {
+        "name": "pytest",
+        "version": null,
+        "category": "testing"
+      }
+    ],
     "packageManager": null,
     "runtime": null
   },
   "build": {
     "buildCommand": null,
-    "testCommand": null,
-    "lintCommand": null,
+    "testCommand": "pytest",
+    "lintCommand": "ruff check",
     "devCommand": null,
     "scripts": {}
   },
@@ -24,314 +39,181 @@
   "structure": {
     "isMonorepo": false,
     "workspaces": [],
-    "mainDirectories": [],
+    "mainDirectories": [
+      "assets",
+      "tests"
+    ],
     "gitBranches": {
       "defaultBranch": "main",
       "branchingStrategy": null
     }
   },
   "customNotes": [],
-  "directoryMap": {},
+  "directoryMap": {
+    "assets": {
+      "path": "assets",
+      "purpose": "Static assets",
+      "fileCount": 1,
+      "lastAccessed": 1772751751396,
+      "keyFiles": [
+        "icon.ico"
+      ]
+    },
+    "bi_extractor": {
+      "path": "bi_extractor",
+      "purpose": null,
+      "fileCount": 1,
+      "lastAccessed": 1772751751404,
+      "keyFiles": [
+        "__init__.py"
+      ]
+    },
+    "bi_extractor.egg-info": {
+      "path": "bi_extractor.egg-info",
+      "purpose": null,
+      "fileCount": 6,
+      "lastAccessed": 1772751751404,
+      "keyFiles": [
+        "dependency_links.txt",
+        "entry_points.txt",
+        "PKG-INFO",
+        "requires.txt",
+        "SOURCES.txt"
+      ]
+    },
+    "build": {
+      "path": "build",
+      "purpose": "Build output",
+      "fileCount": 0,
+      "lastAccessed": 1772751751405,
+      "keyFiles": []
+    },
+    "dist": {
+      "path": "dist",
+      "purpose": "Distribution/build output",
+      "fileCount": 1,
+      "lastAccessed": 1772751751405,
+      "keyFiles": [
+        "bi-extractor-gui.exe"
+      ]
+    },
+    "legacy": {
+      "path": "legacy",
+      "purpose": null,
+      "fileCount": 1,
+      "lastAccessed": 1772751751405,
+      "keyFiles": [
+        "tableau_metadata_extractor.py"
+      ]
+    },
+    "tests": {
+      "path": "tests",
+      "purpose": "Test files",
+      "fileCount": 22,
+      "lastAccessed": 1772751751406,
+      "keyFiles": [
+        "conftest.py",
+        "test_base_parser.py",
+        "test_birt_parser.py",
+        "test_cli.py",
+        "test_cognos_cpf_parser.py"
+      ]
+    },
+    "tmp_test_output": {
+      "path": "tmp_test_output",
+      "purpose": null,
+      "fileCount": 1,
+      "lastAccessed": 1772751751406,
+      "keyFiles": [
+        "BI_Metadata.csv"
+      ]
+    },
+    "tests\\fixtures": {
+      "path": "tests\\fixtures",
+      "purpose": "Test fixtures",
+      "fileCount": 0,
+      "lastAccessed": 1772751751407,
+      "keyFiles": []
+    }
+  },
   "hotPaths": [
     {
-      "path": "bi_extractor\\core\\models.py",
-      "accessCount": 25,
-      "lastAccessed": 1772689037757,
-      "type": "file"
-    },
-    {
-      "path": "bi_extractor\\parsers\\base.py",
-      "accessCount": 19,
-      "lastAccessed": 1772689038203,
-      "type": "file"
-    },
-    {
       "path": "bi_extractor\\parsers\\microsoft\\ssrs_parser.py",
-      "accessCount": 18,
-      "lastAccessed": 1772685398224,
+      "accessCount": 4,
+      "lastAccessed": 1772751847268,
       "type": "file"
     },
     {
-      "path": "tests\\conftest.py",
-      "accessCount": 17,
-      "lastAccessed": 1772682771302,
-      "type": "file"
-    },
-    {
-      "path": "bi_extractor\\parsers\\cognos\\cpf_parser.py",
-      "accessCount": 16,
-      "lastAccessed": 1772685434841,
-      "type": "file"
-    },
-    {
-      "path": "",
-      "accessCount": 16,
-      "lastAccessed": 1772688501406,
-      "type": "directory"
-    },
-    {
-      "path": "pyproject.toml",
-      "accessCount": 16,
-      "lastAccessed": 1772691915953,
-      "type": "file"
-    },
-    {
-      "path": "bi_extractor\\core\\registry.py",
-      "accessCount": 14,
-      "lastAccessed": 1772691922376,
-      "type": "file"
-    },
-    {
-      "path": "bi_extractor\\parsers",
-      "accessCount": 11,
-      "lastAccessed": 1772685277581,
-      "type": "directory"
-    },
-    {
-      "path": "bi_extractor\\parsers\\cognos\\deployment_parser.py",
-      "accessCount": 10,
-      "lastAccessed": 1772669776432,
+      "path": "tests\\test_sql_extraction.py",
+      "accessCount": 3,
+      "lastAccessed": 1772751861907,
       "type": "file"
     },
     {
       "path": "bi_extractor\\parsers\\oracle\\xdo_parser.py",
-      "accessCount": 8,
-      "lastAccessed": 1772685421998,
+      "accessCount": 2,
+      "lastAccessed": 1772751839655,
       "type": "file"
     },
     {
-      "path": "bi_extractor\\output\\csv_formatter.py",
-      "accessCount": 8,
-      "lastAccessed": 1772687994446,
+      "path": "bi_extractor\\parsers\\cognos\\cpf_parser.py",
+      "accessCount": 2,
+      "lastAccessed": 1772751848535,
       "type": "file"
     },
     {
-      "path": "bi_extractor\\core\\engine.py",
-      "accessCount": 8,
-      "lastAccessed": 1772688073727,
+      "path": "bi_extractor\\core\\models.py",
+      "accessCount": 2,
+      "lastAccessed": 1772751862514,
+      "type": "file"
+    },
+    {
+      "path": "bi_extractor\\core\\sql_utils.py",
+      "accessCount": 1,
+      "lastAccessed": 1772751808890,
+      "type": "file"
+    },
+    {
+      "path": "bi_extractor\\parsers\\cognos\\deployment_parser.py",
+      "accessCount": 1,
+      "lastAccessed": 1772751818138,
       "type": "file"
     },
     {
       "path": "bi_extractor\\parsers\\eclipse\\birt_parser.py",
-      "accessCount": 7,
-      "lastAccessed": 1772685413355,
-      "type": "file"
-    },
-    {
-      "path": "bi_extractor\\gui\\__init__.py",
-      "accessCount": 7,
-      "lastAccessed": 1772691916889,
-      "type": "file"
-    },
-    {
-      "path": "tableau_metadata_extractor.py",
-      "accessCount": 6,
-      "lastAccessed": 1772667400813,
+      "accessCount": 1,
+      "lastAccessed": 1772751824595,
       "type": "file"
     },
     {
       "path": "bi_extractor\\parsers\\jasper\\jrxml_parser.py",
-      "accessCount": 6,
-      "lastAccessed": 1772684804135,
-      "type": "file"
-    },
-    {
-      "path": "bi_extractor\\parsers\\tableau\\twb_parser.py",
-      "accessCount": 6,
-      "lastAccessed": 1772684805057,
-      "type": "file"
-    },
-    {
-      "path": "tests\\test_ssrs_parser.py",
-      "accessCount": 6,
-      "lastAccessed": 1772684814671,
-      "type": "file"
-    },
-    {
-      "path": "tests\\test_base_parser.py",
-      "accessCount": 5,
-      "lastAccessed": 1772667456199,
-      "type": "file"
-    },
-    {
-      "path": "bi_extractor\\output\\base.py",
-      "accessCount": 5,
-      "lastAccessed": 1772679532506,
-      "type": "file"
-    },
-    {
-      "path": "bi_extractor\\core\\errors.py",
-      "accessCount": 5,
-      "lastAccessed": 1772682206357,
-      "type": "file"
-    },
-    {
-      "path": "bi_extractor\\cli\\main.py",
-      "accessCount": 4,
-      "lastAccessed": 1772679512643,
-      "type": "file"
-    },
-    {
-      "path": "tests\\fixtures\\ssrs\\sample.rdl",
-      "accessCount": 4,
-      "lastAccessed": 1772684815043,
-      "type": "file"
-    },
-    {
-      "path": "README.md",
-      "accessCount": 3,
-      "lastAccessed": 1772666319703,
-      "type": "file"
-    },
-    {
-      "path": "bi_extractor\\parsers\\tableau\\__init__.py",
-      "accessCount": 3,
-      "lastAccessed": 1772682791791,
-      "type": "file"
-    },
-    {
-      "path": "bi_extractor\\parsers\\tableau\\tds_parser.py",
-      "accessCount": 3,
-      "lastAccessed": 1772684451155,
-      "type": "file"
-    },
-    {
-      "path": "bi_extractor\\__init__.py",
-      "accessCount": 3,
-      "lastAccessed": 1772691927247,
-      "type": "file"
-    },
-    {
-      "path": "bi_extractor\\cli\\__init__.py",
-      "accessCount": 2,
-      "lastAccessed": 1772667459710,
-      "type": "file"
-    },
-    {
-      "path": "tests\\test_xdo_parser.py",
-      "accessCount": 2,
-      "lastAccessed": 1772669175225,
-      "type": "file"
-    },
-    {
-      "path": "tests\\fixtures\\oracle\\sample.xdo",
-      "accessCount": 2,
-      "lastAccessed": 1772669175299,
-      "type": "file"
-    },
-    {
-      "path": "bi_extractor\\parsers\\__init__.py",
-      "accessCount": 2,
-      "lastAccessed": 1772669648561,
-      "type": "file"
-    },
-    {
-      "path": "bi_extractor\\parsers\\cognos\\__init__.py",
-      "accessCount": 2,
-      "lastAccessed": 1772669649032,
-      "type": "file"
-    },
-    {
-      "path": "tests\\test_cli.py",
-      "accessCount": 2,
-      "lastAccessed": 1772679541553,
-      "type": "file"
-    },
-    {
-      "path": "bi_extractor\\core\\__init__.py",
       "accessCount": 1,
-      "lastAccessed": 1772666976733,
+      "lastAccessed": 1772751825130,
       "type": "file"
     },
     {
-      "path": "bi_extractor\\output\\__init__.py",
+      "path": "bi_extractor\\parsers\\microsoft\\pbix_parser.py",
       "accessCount": 1,
-      "lastAccessed": 1772666979031,
+      "lastAccessed": 1772751826550,
       "type": "file"
     },
     {
-      "path": "tests\\test_models.py",
+      "path": "bi_extractor\\output\\csv_formatter.py",
       "accessCount": 1,
-      "lastAccessed": 1772667134755,
+      "lastAccessed": 1772751826648,
       "type": "file"
     },
     {
-      "path": "tests\\test_registry.py",
+      "path": "bi_extractor\\gui\\widgets\\results_panel.py",
       "accessCount": 1,
-      "lastAccessed": 1772667344438,
+      "lastAccessed": 1772751827162,
       "type": "file"
     },
     {
-      "path": "bi_extractor\\parsers\\jasper",
+      "path": "bi_extractor",
       "accessCount": 1,
-      "lastAccessed": 1772667442473,
+      "lastAccessed": 1772751860814,
       "type": "directory"
-    },
-    {
-      "path": "bi_extractor\\parsers\\sap",
-      "accessCount": 1,
-      "lastAccessed": 1772667445880,
-      "type": "directory"
-    },
-    {
-      "path": "bi_extractor\\parsers\\qlik",
-      "accessCount": 1,
-      "lastAccessed": 1772667446427,
-      "type": "directory"
-    },
-    {
-      "path": "bi_extractor\\parsers\\tableau",
-      "accessCount": 1,
-      "lastAccessed": 1772667449669,
-      "type": "directory"
-    },
-    {
-      "path": "tests\\fixtures\\tableau\\sample.tds",
-      "accessCount": 1,
-      "lastAccessed": 1772667472795,
-      "type": "file"
-    },
-    {
-      "path": "tests\\fixtures\\tableau\\sample.twb",
-      "accessCount": 1,
-      "lastAccessed": 1772667496205,
-      "type": "file"
-    },
-    {
-      "path": "tests\\test_tds_parser.py",
-      "accessCount": 1,
-      "lastAccessed": 1772667513241,
-      "type": "file"
-    },
-    {
-      "path": "tests\\fixtures\\jasper\\sample.jrxml",
-      "accessCount": 1,
-      "lastAccessed": 1772667516078,
-      "type": "file"
-    },
-    {
-      "path": "tests\\test_tableau_parser.py",
-      "accessCount": 1,
-      "lastAccessed": 1772667530404,
-      "type": "file"
-    },
-    {
-      "path": "tests\\fixtures\\birt\\sample.rptdesign",
-      "accessCount": 1,
-      "lastAccessed": 1772667550547,
-      "type": "file"
-    },
-    {
-      "path": "tests\\test_jrxml_parser.py",
-      "accessCount": 1,
-      "lastAccessed": 1772667556119,
-      "type": "file"
-    },
-    {
-      "path": "tests\\test_birt_parser.py",
-      "accessCount": 1,
-      "lastAccessed": 1772667578891,
-      "type": "file"
     }
   ],
   "userDirectives": []

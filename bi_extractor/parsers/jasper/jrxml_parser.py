@@ -17,7 +17,9 @@ from bi_extractor.core.models import (
     Field,
     Parameter,
     ReportElement,
+    SQLQuery,
 )
+from bi_extractor.core.sql_utils import extract_tables_from_sql
 from bi_extractor.parsers.base import BaseParser
 
 logger = logging.getLogger(__name__)
@@ -191,7 +193,7 @@ class JrxmlParser(BaseParser):
             logger.debug("Extracted datasource: %s (type=%s)", ds.name, ds.connection_type)
 
     def _extract_query(self, root: ET.Element, result: ExtractionResult) -> None:
-        """Extract SQL query string and store in metadata."""
+        """Extract SQL query string and store in metadata and sql_queries."""
         query_el = root.find(f".//{_tag('queryString')}")
         if query_el is None:
             return
@@ -199,6 +201,17 @@ class JrxmlParser(BaseParser):
         query_text = (query_el.text or "").strip()
         if query_text:
             result.metadata["query"] = query_text
+            report_name = root.get("name", "main")
+            ds_name = result.datasources[0].name if result.datasources else ""
+            result.sql_queries.append(
+                SQLQuery(
+                    name=report_name,
+                    sql_text=query_text,
+                    datasource=ds_name,
+                    dataset=report_name,
+                    tables_referenced=extract_tables_from_sql(query_text),
+                )
+            )
             logger.debug("Extracted queryString (%d chars)", len(query_text))
 
     def _extract_fields(self, root: ET.Element, result: ExtractionResult) -> None:

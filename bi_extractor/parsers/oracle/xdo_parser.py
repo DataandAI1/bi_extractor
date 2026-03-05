@@ -13,7 +13,9 @@ from bi_extractor.core.models import (
     Field,
     Parameter,
     ReportElement,
+    SQLQuery,
 )
+from bi_extractor.core.sql_utils import contains_sql, extract_tables_from_sql
 from bi_extractor.parsers.base import BaseParser
 
 logger = logging.getLogger(__name__)
@@ -79,6 +81,14 @@ class OracleXdoParser(BaseParser):
             sql_map = self._extract_sql_queries(root)
             if sql_map:
                 result.metadata["sql_queries"] = sql_map
+                for q_name, sql_text in sql_map.items():
+                    result.sql_queries.append(
+                        SQLQuery(
+                            name=q_name,
+                            sql_text=sql_text,
+                            tables_referenced=extract_tables_from_sql(sql_text),
+                        )
+                    )
 
             # Store template/report name if present
             template_name = _attr(root, "name", "reportName", "dataObjectName")
@@ -276,7 +286,7 @@ class OracleXdoParser(BaseParser):
         for tag_name in ("sqlStatement", "sql", "query"):
             for idx, sql_el in enumerate(root.iter(tag_name)):
                 sql_text = (sql_el.text or "").strip()
-                if not sql_text:
+                if not sql_text or not contains_sql(sql_text):
                     continue
                 key = _attr(sql_el, "name", "id") or f"{tag_name}_{idx}"
                 sql_map[key] = sql_text

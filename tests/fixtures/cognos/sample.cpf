@@ -35,4 +35,5 @@
   <filters>
     <filter name="DateRange" expression="[Orders].[OrderDate] &gt;= ?p_startDate?" scope="report"/>
   </filters>
+  <nativeSql name="OrdersSql">SELECT o.order_id, o.order_date, o.amount, c.name FROM orders o JOIN customers c ON o.customer_id = c.customer_id WHERE o.order_date &gt;= ?p_startDate?</nativeSql>
 </project>

@@ -20,7 +20,9 @@ from bi_extractor.core.models import (
     Parameter,
     Relationship,
     ReportElement,
+    SQLQuery,
 )
+from bi_extractor.core.sql_utils import contains_sql, extract_tables_from_sql
 from bi_extractor.parsers.base import BaseParser
 
 logger = logging.getLogger(__name__)
@@ -94,6 +96,7 @@ class CognosCpfParser(BaseParser):
             result.relationships = self._extract_relationships(root)
             result.filters = self._extract_filters(root)
             result.report_elements = self._extract_report_elements(root)
+            result.sql_queries = self._extract_sql_queries(root)
 
             # Store project-level metadata
             project_name = _attr(root, "name", "projectName")
@@ -335,3 +338,95 @@ class CognosCpfParser(BaseParser):
             logger.debug("Cognos CPF: found query subject element '%s'", name)
 
         return elements
+
+    def _extract_sql_queries(self, root: ET.Element) -> list[SQLQuery]:
+        """Extract embedded SQL from query subjects, sql elements, and expressions.
+
+        Cognos CPF files can contain SQL in several places:
+        - <querySubject> elements with sql attribute or child <sql> text
+        - Query item expressions that contain SQL fragments
+        - Standalone <sql>, <sqlQuery>, <nativeSql> elements
+
+        querySubject-scoped SQL is scanned first to capture more descriptive
+        names; standalone elements serve as a fallback for SQL not nested
+        inside a querySubject.
+        """
+        queries: list[SQLQuery] = []
+        seen: set[str] = set()
+
+        # 1. Scan querySubject elements first (more descriptive names)
+        for qs_el in _find_all_local(root, "querySubject"):
+            qs_name = _attr(qs_el, "name", "id")
+
+            # Check for sql attribute on the querySubject itself
+            sql_text = _attr(qs_el, "sql", "sqlQuery", "nativeSql")
+            if not sql_text:
+                # Check child <sql> element
+                sql_child = None
+                for child in list(qs_el):
+                    if _strip_ns(child.tag) in ("sql", "sqlQuery", "nativeSql"):
+                        sql_child = child
+                        break
+                if sql_child is not None:
+                    sql_text = (sql_child.text or "").strip()
+
+            if sql_text and contains_sql(sql_text) and sql_text not in seen:
+                seen.add(sql_text)
+                queries.append(
+                    SQLQuery(
+                        name=qs_name,
+                        sql_text=sql_text,
+                        dataset=qs_name,
+                        tables_referenced=extract_tables_from_sql(sql_text),
+                    )
+                )
+                logger.debug(
+                    "Cognos CPF: found SQL in querySubject '%s'", qs_name
+                )
+
+            # 2. Check query item expressions for embedded SQL
+            for qi_el in list(qs_el):
+                if _strip_ns(qi_el.tag) != "queryItem":
+                    continue
+                expression = _attr(qi_el, "expression", "formula")
+                if not expression:
+                    expression = _child_text(qi_el, "expression")
+                if expression and contains_sql(expression) and expression not in seen:
+                    seen.add(expression)
+                    qi_name = _attr(qi_el, "name", "id")
+                    queries.append(
+                        SQLQuery(
+                            name=f"{qs_name}.{qi_name}",
+                            sql_text=expression,
+                            dataset=qs_name,
+                            tables_referenced=extract_tables_from_sql(expression),
+                        )
+                    )
+                    logger.debug(
+                        "Cognos CPF: found SQL in queryItem '%s.%s'",
+                        qs_name, qi_name,
+                    )
+
+        # 3. Fallback: standalone <sql>, <sqlQuery>, <nativeSql> elements
+        #    not already captured via querySubject children
+        for tag_name in ("sql", "sqlQuery", "nativeSql", "query"):
+            for sql_el in _find_all_local(root, tag_name):
+                sql_text = (sql_el.text or "").strip()
+                if not sql_text:
+                    sql_text = _attr(sql_el, "expression", "text", "value")
+                if not sql_text or not contains_sql(sql_text):
+                    continue
+                if sql_text in seen:
+                    continue
+                seen.add(sql_text)
+                name = _attr(sql_el, "name", "id") or tag_name
+                queries.append(
+                    SQLQuery(
+                        name=name,
+                        sql_text=sql_text,
+                        tables_referenced=extract_tables_from_sql(sql_text),
+                    )
+                )
+                logger.debug("Cognos CPF: found SQL in <%s> '%s'", tag_name, name)
+
+        return queries

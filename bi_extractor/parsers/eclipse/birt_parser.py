@@ -12,7 +12,9 @@ from bi_extractor.core.models import (
     Field,
     Parameter,
     ReportElement,
+    SQLQuery,
 )
+from bi_extractor.core.sql_utils import extract_tables_from_sql
 from bi_extractor.parsers.base import BaseParser
 
 logger = logging.getLogger(__name__)
@@ -101,6 +103,15 @@ class BirtParser(BaseParser):
             # Store SQL queries in metadata keyed by dataset name
             if sql_map:
                 result.metadata["sql_queries"] = sql_map
+                for ds_name, sql_text in sql_map.items():
+                    result.sql_queries.append(
+                        SQLQuery(
+                            name=ds_name,
+                            sql_text=sql_text,
+                            dataset=ds_name,
+                            tables_referenced=extract_tables_from_sql(sql_text),
+                        )
+                    )
 
         except Exception as exc:  # noqa: BLE001
             msg = f"Unexpected error parsing {source}: {exc}"

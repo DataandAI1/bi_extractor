@@ -63,6 +63,7 @@ class ResultsPanel(ttk.LabelFrame):
         ("parameters", "Parameters", 80, "center"),
         ("relationships", "Relationships", 90, "center"),
         ("filters", "Filters", 60, "center"),
+        ("sql_queries", "SQL Queries", 80, "center"),
         ("errors", "Errors", 60, "center"),
     ]
 
@@ -79,7 +80,7 @@ class ResultsPanel(ttk.LabelFrame):
 
     # Numeric columns for sorting
     _NUMERIC_COLS = {"fields", "datasources", "elements", "parameters",
-                     "relationships", "filters", "errors"}
+                     "relationships", "filters", "sql_queries", "errors"}
 
     def __init__(
         self,
@@ -146,6 +147,12 @@ class ResultsPanel(ttk.LabelFrame):
             self._detail_header, text="", foreground="orange"
         )
         self._truncation_label.pack(side=tk.RIGHT)
+
+        # SQL queries label at the bottom of the detail frame
+        self._sql_label = ttk.Label(
+            detail_frame, text="", foreground="blue", justify="left", wraplength=800
+        )
+        self._sql_label.pack(side=tk.BOTTOM, fill=tk.X, pady=(4, 0))
 
         # Error label at the bottom of the detail frame
         self._error_label = ttk.Label(
@@ -226,6 +233,7 @@ class ResultsPanel(ttk.LabelFrame):
             len(result.parameters),
             len(result.relationships),
             len(result.filters),
+            len(result.sql_queries),
             error_count,
         )
         tags = ("error",) if error_count > 0 else ()
@@ -271,6 +279,18 @@ class ResultsPanel(ttk.LabelFrame):
         else:
             self._error_label.config(text="")
 
+        if result.sql_queries:
+            sql_lines = [f"SQL Queries ({len(result.sql_queries)}):"]
+            for sq in result.sql_queries:
+                sql_display = sq.sql_text
+                if len(sql_display) > 120:
+                    sql_display = sql_display[:117] + "..."
+                tables = ", ".join(sq.tables_referenced) if sq.tables_referenced else ""
+                table_info = f" [tables: {tables}]" if tables else ""
+                sql_lines.append(f"- {sq.name}: {sql_display}{table_info}")
+            self._sql_label.config(text="\n".join(sql_lines))
+        else:
+            self._sql_label.config(text="")
 
         for field in fields:
             formula_display = field.formula
@@ -294,6 +314,7 @@ class ResultsPanel(ttk.LabelFrame):
         self._detail_title.config(text="Select a file above to view field details")
         self._truncation_label.config(text="")
         self._error_label.config(text="")
+        self._sql_label.config(text="")
         self._truncated = False
         self._tooltip.hide()
 

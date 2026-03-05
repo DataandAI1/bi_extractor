@@ -24,7 +24,9 @@ from bi_extractor.core.models import (
     Filter,
     Relationship,
     ReportElement,
+    SQLQuery,
 )
+from bi_extractor.core.sql_utils import contains_sql, extract_tables_from_sql
 from bi_extractor.parsers.base import BaseParser
 
 logger = logging.getLogger(__name__)
@@ -53,6 +55,13 @@ _NUMERIC_DATATYPES: set[str] = {
 # Matches:  shared TableName = ...  and  shared #"Table Name" = ...
 _M_SHARED_RE = re.compile(
     r'shared\s+(?:#"([^"]+)"|(\w+))\s*=',
+)
+
+# Regex to extract native SQL from M expressions
+# Matches: Value.NativeQuery(source, "SELECT ...") or query strings in M
+_M_NATIVE_SQL_RE = re.compile(
+    r'(?:NativeQuery|Query)\s*[=(,]\s*"((?:[^"\\]|\\.|"")*)"',
+    re.IGNORECASE | re.DOTALL,
 )
 
 # Regex for common M data source functions beyond Sql.Database
@@ -173,6 +182,11 @@ class PbixParser(BaseParser):
             if layout is not None:
                 result.report_elements = self._extract_report_elements(layout)
                 result.filters = self._extract_filters(layout)
+
+            # Extract SQL queries from M expressions and partition sources
+            if model is not None:
+                inner = model.get("model", model)
+                self._extract_sql_from_model(inner, result)
 
             if is_legacy and not result.fields:
                 result.metadata["legacy_format"] = "true"
@@ -304,6 +318,58 @@ class PbixParser(BaseParser):
                         )
 
         return datasources
+
+    def _extract_sql_from_model(
+        self, model: dict[str, Any], result: ExtractionResult
+    ) -> None:
+        """Extract SQL queries from table partition M expressions.
+
+        Power BI tables with M partitions may contain native SQL queries
+        via Sql.Database("server", "db") calls with optional Query or
+        NativeQuery steps. DAX measures with EVALUATE are also captured.
+        """
+        for table in model.get("tables", []):
+            table_name = table.get("name", "")
+            for partition in table.get("partitions", []):
+                source = partition.get("source", {})
+                if source.get("type", "").lower() != "m":
+                    continue
+                expression = source.get("expression", "")
+                if isinstance(expression, list):
+                    expression = "\n".join(expression)
+                if not expression:
+                    continue
+
+                # Look for native SQL in M expressions:
+                # Value.NativeQuery(source, "SELECT ...")
+                # or #"Native Query" = "SELECT ..."
+                sql_texts = _M_NATIVE_SQL_RE.findall(expression)
+                for sql_text in sql_texts:
+                    sql_text = sql_text.strip().strip('"')
+                    if contains_sql(sql_text):
+                        result.sql_queries.append(
+                            SQLQuery(
+                                name=f"{table_name}_partition",
+                                sql_text=sql_text,
+                                dataset=table_name,
+                                tables_referenced=extract_tables_from_sql(sql_text),
+                            )
+                        )
+                        logger.debug(
+                            "PBIX: found native SQL in M expression for table '%s'",
+                            table_name,
+                        )
+
+                # Also check if the entire expression looks like SQL
+                if not sql_texts and contains_sql(expression):
+                    result.sql_queries.append(
+                        SQLQuery(
+                            name=f"{table_name}_partition",
+                            sql_text=expression,
+                            dataset=table_name,
+                            tables_referenced=extract_tables_from_sql(expression),
+                        )
+                    )
 
     def _extract_connections(
         self,

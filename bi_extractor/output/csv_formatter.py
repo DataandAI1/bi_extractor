@@ -40,6 +40,8 @@ EXTENDED_COLUMNS = [
     "File Type",
     "Parameter Count",
     "Relationship Count",
+    "SQL Query Count",
+    "SQL Queries",
     "Extraction Errors",
 ]
 
@@ -92,6 +94,8 @@ def to_flat_rows(results: list[ExtractionResult]) -> list[dict[str, str]]:
                 "File Type": result.file_type,
                 "Parameter Count": str(len(result.parameters)),
                 "Relationship Count": str(len(result.relationships)),
+                "SQL Query Count": str(len(result.sql_queries)),
+                "SQL Queries": _format_sql_queries(result),
                 "Extraction Errors": "; ".join(result.errors) if result.errors else "",
             })
             column_id += 1
@@ -166,8 +170,27 @@ def _make_row(
         "File Type": result.file_type,
         "Parameter Count": str(len(result.parameters)),
         "Relationship Count": str(len(result.relationships)),
+        "SQL Query Count": str(len(result.sql_queries)),
+        "SQL Queries": _format_sql_queries(result),
         "Extraction Errors": "; ".join(result.errors) if result.errors else "",
     }
+
+
+def _format_sql_queries(result: ExtractionResult) -> str:
+    """Format SQL queries for CSV output.
+
+    Each query is formatted as 'name: sql_text' and joined with ' || '.
+    SQL text is truncated to 200 chars per query to keep CSV cells manageable.
+    """
+    if not result.sql_queries:
+        return ""
+    parts: list[str] = []
+    for sq in result.sql_queries:
+        sql = sq.sql_text
+        if len(sql) > 200:
+            sql = sql[:197] + "..."
+        parts.append(f"{sq.name}: {sql}")
+    return " || ".join(parts)
 
 
 class CsvFormatter:

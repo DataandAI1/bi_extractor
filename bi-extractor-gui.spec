@@ -89,5 +89,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    # icon="assets/icon.ico",  # Uncomment when you have an icon
+    icon="assets/icon.ico",
 )

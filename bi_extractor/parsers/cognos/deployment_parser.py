@@ -18,7 +18,9 @@ from bi_extractor.core.models import (
     Field,
     Parameter,
     ReportElement,
+    SQLQuery,
 )
+from bi_extractor.core.sql_utils import contains_sql, extract_tables_from_sql
 from bi_extractor.parsers.base import BaseParser
 
 logger = logging.getLogger(__name__)
@@ -194,3 +196,38 @@ class CognosDeploymentParser(BaseParser):
                             element_type=tag_name,
                         )
                     )
+
+        # Extract embedded SQL from sql/sqlQuery/nativeSql elements and
+        # query item expressions
+        seen_sql: set[str] = set()
+        for sql_tag in ("sql", "sqlQuery", "nativeSql"):
+            for sql_el in _find_all_local(root, sql_tag):
+                sql_text = (sql_el.text or "").strip()
+                if not sql_text:
+                    sql_text = _attr(sql_el, "expression", "text", "value")
+                if sql_text and contains_sql(sql_text) and sql_text not in seen_sql:
+                    seen_sql.add(sql_text)
+                    name = _attr(sql_el, "name", "id") or f"{sql_tag}_{entry_name}"
+                    result.sql_queries.append(
+                        SQLQuery(
+                            name=name,
+                            sql_text=sql_text,
+                            tables_referenced=extract_tables_from_sql(sql_text),
+                        )
+                    )
+
+        # Also check query item expressions for SQL
+        for qi_el in _find_all_local(root, "queryItem"):
+            expression = _attr(qi_el, "expression")
+            if not expression:
+                expression = _child_text(qi_el, "expression")
+            if expression and contains_sql(expression) and expression not in seen_sql:
+                seen_sql.add(expression)
+                qi_name = _attr(qi_el, "name", "id") or "queryItem"
+                result.sql_queries.append(
+                    SQLQuery(
+                        name=qi_name,
+                        sql_text=expression,
+                        tables_referenced=extract_tables_from_sql(expression),
+                    )
+                )

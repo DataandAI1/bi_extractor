@@ -27,7 +27,9 @@ from bi_extractor.core.models import (
     Filter,
     Parameter,
     ReportElement,
+    SQLQuery,
 )
+from bi_extractor.core.sql_utils import extract_tables_from_sql
 from bi_extractor.parsers.base import BaseParser
 
 logger = logging.getLogger(__name__)
@@ -42,12 +44,6 @@ _RDL_NAMESPACES: list[str] = [
 
 # Regex to find =Fields!FieldName.Value references in RDL expressions
 _FIELD_REF_RE = re.compile(r"Fields!(\w+)\.Value", re.IGNORECASE)
-
-# Regex to extract table names from SQL queries (FROM and JOIN clauses)
-_SQL_TABLE_RE = re.compile(
-    r"(?:FROM|JOIN)\s+(?:\[?(\w+)\]?\.)?(?:\[?(\w+)\]?\.)?(\[?\w+\]?)",
-    re.IGNORECASE,
-)
 
 # Regex for connection string key=value parsing
 _CONN_STR_RE = re.compile(r"([\w\s]+?)\s*=\s*([^;]*)")
@@ -122,17 +118,6 @@ def _infer_role(data_type: str) -> str:
     return "dimension"
 
 
-def _extract_tables_from_sql(sql: str) -> list[str]:
-    """Extract table names from SQL FROM/JOIN clauses."""
-    tables: list[str] = []
-    seen: set[str] = set()
-    for match in _SQL_TABLE_RE.finditer(sql):
-        # group(3) is always the table name; group(2) may be schema; group(1) may be db
-        table_name = match.group(3).strip("[]")
-        if table_name.lower() not in seen:
-            seen.add(table_name.lower())
-            tables.append(table_name)
-    return tables
 
 
 def _collect_field_refs(element: ET.Element) -> set[str]:
@@ -303,7 +288,7 @@ class SsrsParser(BaseParser):
             logger.debug("No <DataSets> element found.")
             return
 
-        queries: dict[str, str] = {}
+        queries: dict[str, tuple[str, list[str]]] = {}
 
         for dataset_el in datasets_el.findall(_ns("DataSet", ns)):
             dataset_name = dataset_el.get("Name", "").strip()
@@ -316,10 +301,11 @@ class SsrsParser(BaseParser):
             # Extract CommandText.
             command_text = _find_text(dataset_el, "Query/CommandText", ns)
             if command_text:
-                queries[dataset_name] = command_text
+                # Extract tables once and cache with the SQL text
+                tables = extract_tables_from_sql(command_text)
+                queries[dataset_name] = (command_text, tables)
 
-                # Extract tables from SQL and add to the datasource
-                tables = _extract_tables_from_sql(command_text)
+                # Add tables to the datasource
                 if tables:
                     for ds in result.datasources:
                         if ds.name == datasource_ref:
@@ -411,8 +397,19 @@ class SsrsParser(BaseParser):
 
         if queries:
             result.metadata["queries"] = [
-                f"{name}: {sql}" for name, sql in queries.items()
+                f"{name}: {sql}" for name, (sql, _tables) in queries.items()
             ]
+            for ds_name, (sql_text, tables) in queries.items():
+                datasource_ref = dataset_ds_map.get(ds_name, "")
+                result.sql_queries.append(
+                    SQLQuery(
+                        name=ds_name,
+                        sql_text=sql_text,
+                        datasource=datasource_ref,
+                        dataset=ds_name,
+                        tables_referenced=tables,
+                    )
+                )
 
     def _extract_parameters(
         self, root: ET.Element, ns: str, result: ExtractionResult

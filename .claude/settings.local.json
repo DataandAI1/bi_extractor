@@ -39,7 +39,9 @@
       "Bash(python -m pytest tests/ -q --tb=short)",
       "Bash(python -m pytest tests/test_ssrs_parser.py -v --tb=short)",
       "Bash(python -m pytest tests/test_pbix_parser.py -v --tb=short)",
-      "Bash(python -m pytest -q)"
+      "Bash(python -m pytest -q)",
+      "Bash(pip install openpyxl javaobj-py3 cabarchive tkinterdnd2 Pillow)",
+      "mcp__plugin_oh-my-claudecode_t__notepad_read"
     ]
   }
 }
