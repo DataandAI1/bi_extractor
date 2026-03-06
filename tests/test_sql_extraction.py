@@ -8,7 +8,7 @@ import pytest
 
 from bi_extractor.core.models import ExtractionResult, SQLQuery
 from bi_extractor.core.sql_utils import contains_sql, extract_tables_from_sql, normalize_sql
-from bi_extractor.output.csv_formatter import to_flat_rows
+from bi_extractor.output.csv_formatter import CsvFormatter, to_flat_rows, to_sql_rows
 
 FIXTURES_DIR = Path(__file__).parent / "fixtures"
 
@@ -574,3 +574,114 @@ class TestCognosCpfSyntheticSql:
         result = parser.parse(cpf_file)
 
         assert result.sql_queries == []
+
+
+# ======================================================================
+# Separate SQL CSV file tests
+# ======================================================================
+
+
+class TestSqlCsvFile:
+    """Test the separate BI_SQL_Queries.csv output."""
+
+    def _make_result_with_sql(self) -> ExtractionResult:
+        result = ExtractionResult(
+            source_file="report.rdl",
+            file_type="rdl",
+            tool_name="SSRS",
+        )
+        result.sql_queries.append(
+            SQLQuery(
+                name="SalesQuery",
+                sql_text="SELECT id, name, amount FROM dbo.orders WHERE year = 2024",
+                datasource="SalesDB",
+                dataset="SalesDataSet",
+                tables_referenced=["orders"],
+            )
+        )
+        result.sql_queries.append(
+            SQLQuery(
+                name="DetailQuery",
+                sql_text="SELECT d.item, d.qty FROM order_details d JOIN products p ON d.pid = p.id",
+                datasource="SalesDB",
+                dataset="DetailDataSet",
+                tables_referenced=["order_details", "products"],
+            )
+        )
+        return result
+
+    def test_to_sql_rows_produces_one_row_per_query(self) -> None:
+        result = self._make_result_with_sql()
+        rows = to_sql_rows([result])
+        assert len(rows) == 2
+
+    def test_to_sql_rows_full_sql_not_truncated(self) -> None:
+        result = ExtractionResult(
+            source_file="big.rdl", file_type="rdl", tool_name="SSRS"
+        )
+        long_sql = "SELECT " + ", ".join(f"col{i}" for i in range(100)) + " FROM very_wide_table"
+        result.sql_queries.append(
+            SQLQuery(name="BigQuery", sql_text=long_sql, tables_referenced=["very_wide_table"])
+        )
+        rows = to_sql_rows([result])
+        assert len(rows) == 1
+        # Full SQL preserved — no truncation
+        assert rows[0]["SQL Text"] == long_sql
+        assert "..." not in rows[0]["SQL Text"]
+
+    def test_to_sql_rows_columns(self) -> None:
+        result = self._make_result_with_sql()
+        rows = to_sql_rows([result])
+        row = rows[0]
+        assert row["Source File"] == "report.rdl"
+        assert row["Tool"] == "SSRS"
+        assert row["Query Name"] == "SalesQuery"
+        assert row["Dataset"] == "SalesDataSet"
+        assert row["Datasource"] == "SalesDB"
+        assert row["Tables Referenced"] == "orders"
+        assert "SELECT" in row["SQL Text"]
+
+    def test_to_sql_rows_empty_when_no_queries(self) -> None:
+        result = ExtractionResult(
+            source_file="empty.rdl", file_type="rdl", tool_name="SSRS"
+        )
+        rows = to_sql_rows([result])
+        assert rows == []
+
+    def test_write_sql_queries_creates_file(self, tmp_path: Path) -> None:
+        result = self._make_result_with_sql()
+        formatter = CsvFormatter()
+        sql_path = formatter.write_sql_queries([result], tmp_path)
+        assert sql_path is not None
+        assert sql_path.exists()
+        assert sql_path.name == "BI_SQL_Queries.csv"
+
+    def test_write_sql_queries_returns_none_when_empty(self, tmp_path: Path) -> None:
+        result = ExtractionResult(
+            source_file="empty.rdl", file_type="rdl", tool_name="SSRS"
+        )
+        formatter = CsvFormatter()
+        sql_path = formatter.write_sql_queries([result], tmp_path)
+        assert sql_path is None
+
+    def test_write_creates_both_files(self, tmp_path: Path) -> None:
+        result = self._make_result_with_sql()
+        from bi_extractor.core.models import Field
+        result.fields.append(Field(name="id", datasource="ds1"))
+
+        formatter = CsvFormatter()
+        main_csv = formatter.write([result], tmp_path)
+        sql_csv = tmp_path / "BI_SQL_Queries.csv"
+
+        assert main_csv.exists()
+        assert sql_csv.exists()
+
+    def test_sql_file_contains_full_text(self, tmp_path: Path) -> None:
+        result = self._make_result_with_sql()
+        formatter = CsvFormatter()
+        sql_path = formatter.write_sql_queries([result], tmp_path)
+        assert sql_path is not None
+        content = sql_path.read_text(encoding="utf-8")
+        # Full SQL text present, not truncated
+        assert "SELECT id, name, amount FROM dbo.orders WHERE year = 2024" in content
+        assert "SELECT d.item, d.qty FROM order_details d JOIN products p ON d.pid = p.id" in content

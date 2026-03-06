@@ -193,6 +193,37 @@ def _format_sql_queries(result: ExtractionResult) -> str:
     return " || ".join(parts)
 
 
+SQL_COLUMNS = [
+    "Source File",
+    "Tool",
+    "Query Name",
+    "Dataset",
+    "Datasource",
+    "Tables Referenced",
+    "SQL Text",
+]
+
+
+def to_sql_rows(results: list[ExtractionResult]) -> list[dict[str, str]]:
+    """Flatten SQL queries across all results into CSV-ready row dicts.
+
+    Produces one row per SQL query with full, untruncated SQL text.
+    """
+    rows: list[dict[str, str]] = []
+    for result in results:
+        for sq in result.sql_queries:
+            rows.append({
+                "Source File": Path(result.source_file).name,
+                "Tool": result.tool_name,
+                "Query Name": sq.name,
+                "Dataset": sq.dataset,
+                "Datasource": sq.datasource,
+                "Tables Referenced": ", ".join(sq.tables_referenced),
+                "SQL Text": sq.sql_text,
+            })
+    return rows
+
+
 class CsvFormatter:
     """CSV output formatter."""
 
@@ -207,13 +238,16 @@ class CsvFormatter:
     ) -> Path:
         """Write extraction results as a CSV file.
 
+        Also writes a separate BI_SQL_Queries.csv alongside the main CSV
+        when any SQL queries are found.
+
         Args:
             results: List of extraction results.
             output_path: Directory to write into.
-            filename: Output filename (default: bi_metadata.csv).
+            filename: Output filename (default: BI_Metadata.csv).
 
         Returns:
-            Path to the written CSV file.
+            Path to the written main CSV file.
         """
         rows = to_flat_rows(results)
 
@@ -230,4 +264,37 @@ class CsvFormatter:
             writer.writerows(rows)
 
         logger.info("Wrote %d rows to %s", len(rows), output_file)
+
+        # Write separate SQL queries file if any queries exist
+        self.write_sql_queries(results, output_path)
+
+        return output_file
+
+    def write_sql_queries(
+        self,
+        results: list[ExtractionResult],
+        output_path: Path,
+        filename: str = "BI_SQL_Queries.csv",
+    ) -> Path | None:
+        """Write a separate CSV containing full, untruncated SQL queries.
+
+        Args:
+            results: List of extraction results.
+            output_path: Directory to write into.
+            filename: Output filename (default: BI_SQL_Queries.csv).
+
+        Returns:
+            Path to the written SQL CSV file, or None if no SQL queries found.
+        """
+        sql_rows = to_sql_rows(results)
+        if not sql_rows:
+            return None
+
+        output_file = output_path / filename
+        with open(output_file, "w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=SQL_COLUMNS)
+            writer.writeheader()
+            writer.writerows(sql_rows)
+
+        logger.info("Wrote %d SQL queries to %s", len(sql_rows), output_file)
         return output_file

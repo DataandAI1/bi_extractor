@@ -138,15 +138,27 @@
   },
   "hotPaths": [
     {
+      "path": "tests\\test_sql_extraction.py",
+      "accessCount": 7,
+      "lastAccessed": 1772755314960,
+      "type": "file"
+    },
+    {
       "path": "bi_extractor\\parsers\\microsoft\\ssrs_parser.py",
       "accessCount": 4,
       "lastAccessed": 1772751847268,
       "type": "file"
     },
     {
-      "path": "tests\\test_sql_extraction.py",
+      "path": "bi_extractor\\output\\csv_formatter.py",
+      "accessCount": 4,
+      "lastAccessed": 1772755314449,
+      "type": "file"
+    },
+    {
+      "path": "bi_extractor\\gui\\app.py",
       "accessCount": 3,
-      "lastAccessed": 1772751861907,
+      "lastAccessed": 1772755314850,
       "type": "file"
     },
     {
@@ -195,12 +207,6 @@
       "path": "bi_extractor\\parsers\\microsoft\\pbix_parser.py",
       "accessCount": 1,
       "lastAccessed": 1772751826550,
-      "type": "file"
-    },
-    {
-      "path": "bi_extractor\\output\\csv_formatter.py",
-      "accessCount": 1,
-      "lastAccessed": 1772751826648,
       "type": "file"
     },
     {

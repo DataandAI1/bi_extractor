@@ -332,8 +332,19 @@ class BiExtractorApp(_Base):  # type: ignore[misc]
             output = formatter.write(
                 results, chosen_path.parent, filename=chosen_path.name
             )
-            self._set_status(f"Exported to: {output}")
-            messagebox.showinfo("Export", f"Results exported to:\n{output}")
+
+            # Check if a separate SQL file was also written
+            sql_file = chosen_path.parent / "BI_SQL_Queries.csv"
+            if sql_file.exists():
+                self._set_status(f"Exported to: {output} + {sql_file.name}")
+                messagebox.showinfo(
+                    "Export",
+                    f"Results exported to:\n{output}\n\n"
+                    f"SQL queries exported to:\n{sql_file}",
+                )
+            else:
+                self._set_status(f"Exported to: {output}")
+                messagebox.showinfo("Export", f"Results exported to:\n{output}")
         except OSError as e:
             messagebox.showerror("Export Error", f"Failed to write CSV:\n{e}")
 
