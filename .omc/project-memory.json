@@ -145,8 +145,8 @@
     },
     {
       "path": "bi_extractor\\parsers\\microsoft\\ssrs_parser.py",
-      "accessCount": 4,
-      "lastAccessed": 1772751847268,
+      "accessCount": 5,
+      "lastAccessed": 1772822187708,
       "type": "file"
     },
     {
@@ -162,15 +162,21 @@
       "type": "file"
     },
     {
-      "path": "bi_extractor\\parsers\\oracle\\xdo_parser.py",
-      "accessCount": 2,
-      "lastAccessed": 1772751839655,
+      "path": "bi_extractor\\parsers\\cognos\\cpf_parser.py",
+      "accessCount": 3,
+      "lastAccessed": 1772822190693,
       "type": "file"
     },
     {
-      "path": "bi_extractor\\parsers\\cognos\\cpf_parser.py",
-      "accessCount": 2,
-      "lastAccessed": 1772751848535,
+      "path": "bi_extractor\\parsers\\oracle\\xdo_parser.py",
+      "accessCount": 3,
+      "lastAccessed": 1772822196999,
+      "type": "file"
+    },
+    {
+      "path": "README.md",
+      "accessCount": 3,
+      "lastAccessed": 1772822294597,
       "type": "file"
     },
     {
@@ -180,33 +186,39 @@
       "type": "file"
     },
     {
-      "path": "bi_extractor\\core\\sql_utils.py",
-      "accessCount": 1,
-      "lastAccessed": 1772751808890,
+      "path": "bi_extractor\\parsers\\microsoft\\pbix_parser.py",
+      "accessCount": 2,
+      "lastAccessed": 1772822190538,
       "type": "file"
     },
     {
       "path": "bi_extractor\\parsers\\cognos\\deployment_parser.py",
-      "accessCount": 1,
-      "lastAccessed": 1772751818138,
+      "accessCount": 2,
+      "lastAccessed": 1772822191122,
       "type": "file"
     },
     {
       "path": "bi_extractor\\parsers\\eclipse\\birt_parser.py",
-      "accessCount": 1,
-      "lastAccessed": 1772751824595,
+      "accessCount": 2,
+      "lastAccessed": 1772822191312,
       "type": "file"
+    },
+    {
+      "path": "bi_extractor\\parsers",
+      "accessCount": 2,
+      "lastAccessed": 1772822194016,
+      "type": "directory"
     },
     {
       "path": "bi_extractor\\parsers\\jasper\\jrxml_parser.py",
-      "accessCount": 1,
-      "lastAccessed": 1772751825130,
+      "accessCount": 2,
+      "lastAccessed": 1772822196443,
       "type": "file"
     },
     {
-      "path": "bi_extractor\\parsers\\microsoft\\pbix_parser.py",
+      "path": "bi_extractor\\core\\sql_utils.py",
       "accessCount": 1,
-      "lastAccessed": 1772751826550,
+      "lastAccessed": 1772751808890,
       "type": "file"
     },
     {
@@ -225,6 +237,60 @@
       "path": "bi-extractor-gui.spec",
       "accessCount": 1,
       "lastAccessed": 1772753786145,
+      "type": "file"
+    },
+    {
+      "path": "",
+      "accessCount": 1,
+      "lastAccessed": 1772822177614,
+      "type": "directory"
+    },
+    {
+      "path": "bi_extractor\\core\\registry.py",
+      "accessCount": 1,
+      "lastAccessed": 1772822180495,
+      "type": "file"
+    },
+    {
+      "path": "bi_extractor\\parsers\\base.py",
+      "accessCount": 1,
+      "lastAccessed": 1772822184569,
+      "type": "file"
+    },
+    {
+      "path": "bi_extractor\\parsers\\tableau\\twb_parser.py",
+      "accessCount": 1,
+      "lastAccessed": 1772822187112,
+      "type": "file"
+    },
+    {
+      "path": "bi_extractor\\parsers\\tableau\\tds_parser.py",
+      "accessCount": 1,
+      "lastAccessed": 1772822187272,
+      "type": "file"
+    },
+    {
+      "path": "bi_extractor\\parsers\\tableau\\hyper_parser.py",
+      "accessCount": 1,
+      "lastAccessed": 1772822187579,
+      "type": "file"
+    },
+    {
+      "path": "bi_extractor\\parsers\\qlik\\qvd_parser.py",
+      "accessCount": 1,
+      "lastAccessed": 1772822197127,
+      "type": "file"
+    },
+    {
+      "path": "bi_extractor\\parsers\\qlik\\qvf_parser.py",
+      "accessCount": 1,
+      "lastAccessed": 1772822197972,
+      "type": "file"
+    },
+    {
+      "path": "bi_extractor\\parsers\\microstrategy\\mstr_parser.py",
+      "accessCount": 1,
+      "lastAccessed": 1772822199735,
       "type": "file"
     }
   ],

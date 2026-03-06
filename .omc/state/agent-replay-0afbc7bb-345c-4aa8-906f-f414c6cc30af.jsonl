@@ -13,3 +13,5 @@
 {"t":0,"agent":"a567320","agent_type":"Explore","event":"agent_stop","success":true,"duration_ms":41513}
 {"t":0,"agent":"a757b8a","agent_type":"architect","event":"agent_start","parent_mode":"ultrawork"}
 {"t":0,"agent":"a757b8a","agent_type":"architect","event":"agent_stop","success":true,"duration_ms":41929}
+{"t":0,"agent":"a8b9ef6","agent_type":"Explore","event":"agent_start","parent_mode":"none"}
+{"t":0,"agent":"a8b9ef6","agent_type":"Explore","event":"agent_stop","success":true,"duration_ms":93137}
